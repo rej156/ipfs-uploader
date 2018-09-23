@@ -8,13 +8,17 @@ let make = _children => {
     <div>
       <BrowserWeb3Capabilities>
         ...{
-             ({hasWeb3, isLoggedIn}) =>
+             ({hasWeb3, isLoggedIn, isLockedAccount}) =>
                <div>
                  <p>
                    ("hasweb3 " ++ hasWeb3->string_of_bool)->ReasonReact.string
                  </p>
                  <p>
                    ("isloggedin " ++ isLoggedIn->string_of_bool)
+                   ->ReasonReact.string
+                 </p>
+                 <p>
+                   ("isLockedAccount " ++ isLockedAccount->string_of_bool)
                    ->ReasonReact.string
                  </p>
                </div>

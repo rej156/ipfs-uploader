@@ -1,19 +1,25 @@
-type web3 = {. "version": {. "api": string}};
+type web3 = {. "eth": {. "accounts": array(string)}};
 [@bs.val] external web3: Js.Nullable.t(web3) = "window.web3";
 
 type state = {
   hasWeb3: bool,
   isLoggedIn: bool,
+  isLockedAccount: bool,
 };
 
 /* Action declaration */
 type action =
+  | SetLockedAccountStatus(bool)
   | SetWeb3Status(bool);
 let component = ReasonReact.reducerComponent(__MODULE__);
 
 let make = children => {
   ...component,
-  initialState: () => {hasWeb3: false, isLoggedIn: false},
+  initialState: () => {
+    hasWeb3: false,
+    isLoggedIn: false,
+    isLockedAccount: false,
+  },
   didMount: self => {
     let getWeb3StatusIntervalId =
       Js.Global.setInterval(
@@ -21,19 +27,36 @@ let make = children => {
           self.send(
             SetWeb3Status(
               Js.Nullable.toOption(web3)
-              ->Belt.Option.mapWithDefault(false, _web3
-                  /* Js.log(web3##version##api); */
-                  => true),
+              ->Belt.Option.mapWithDefault(false, _ => true),
             ),
           ),
         1000,
       );
-    self.onUnmount(() => Js.Global.clearInterval(getWeb3StatusIntervalId));
+    let getLockedAccountStatusIntervalId =
+      Js.Global.setInterval(
+        () =>
+          self.send(
+            SetLockedAccountStatus(
+              Js.Nullable.toOption(web3)
+              ->Belt.Option.mapWithDefault(false, web3 =>
+                  Js.Array.length(web3##eth##accounts) === 0
+                ),
+            ),
+          ),
+        1000,
+      );
+
+    self.onUnmount(() => {
+      Js.Global.clearInterval(getWeb3StatusIntervalId);
+      Js.Global.clearInterval(getLockedAccountStatusIntervalId);
+    });
   },
   reducer: (action, state) =>
     switch (action) {
     | SetWeb3Status(status) =>
       ReasonReact.Update({...state, hasWeb3: status})
+    | SetLockedAccountStatus(status) =>
+      ReasonReact.Update({...state, isLockedAccount: status})
     },
   render: self => children(self.state),
 };
