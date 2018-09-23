@@ -1,0 +1,7 @@
+.cache
+node_modules
+yarn-error.log
+.merlin
+/public
+lib
+src/**/*.bs.js
