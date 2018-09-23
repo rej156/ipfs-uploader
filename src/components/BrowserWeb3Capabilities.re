@@ -13,6 +13,9 @@ type action =
   | SetWeb3Status(bool);
 let component = ReasonReact.reducerComponent(__MODULE__);
 
+let getWeb3BoundStatus = conditional =>
+  Js.Nullable.toOption(web3)->Belt.Option.mapWithDefault(false, conditional);
+
 let make = children => {
   ...component,
   initialState: () => {
@@ -23,13 +26,7 @@ let make = children => {
   didMount: self => {
     let getWeb3StatusIntervalId =
       Js.Global.setInterval(
-        () =>
-          self.send(
-            SetWeb3Status(
-              Js.Nullable.toOption(web3)
-              ->Belt.Option.mapWithDefault(false, _ => true),
-            ),
-          ),
+        () => self.send(SetWeb3Status(getWeb3BoundStatus(_ => true))),
         1000,
       );
     let getLockedAccountStatusIntervalId =
@@ -37,10 +34,9 @@ let make = children => {
         () =>
           self.send(
             SetLockedAccountStatus(
-              Js.Nullable.toOption(web3)
-              ->Belt.Option.mapWithDefault(false, web3 =>
-                  Js.Array.length(web3##eth##accounts) === 0
-                ),
+              getWeb3BoundStatus(web3 =>
+                Js.Array.length(web3##eth##accounts) === 0
+              ),
             ),
           ),
         1000,

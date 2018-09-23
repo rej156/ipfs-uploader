@@ -11,10 +11,10 @@ let make = _children => {
              ({hasWeb3, isLoggedIn, isLockedAccount}) =>
                <div>
                  <p>
-                   ("hasweb3 " ++ hasWeb3->string_of_bool)->ReasonReact.string
+                   ("hasWeb3 " ++ hasWeb3->string_of_bool)->ReasonReact.string
                  </p>
                  <p>
-                   ("isloggedin " ++ isLoggedIn->string_of_bool)
+                   ("isLoggedin " ++ isLoggedIn->string_of_bool)
                    ->ReasonReact.string
                  </p>
                  <p>
