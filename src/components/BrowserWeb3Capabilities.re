@@ -3,7 +3,6 @@ type web3 = {. "eth": {. "accounts": array(string)}};
 
 type state = {
   hasWeb3: bool,
-  isLoggedIn: bool,
   isLockedAccount: bool,
 };
 
@@ -18,11 +17,7 @@ let getWeb3BoundStatus = conditional =>
 
 let make = children => {
   ...component,
-  initialState: () => {
-    hasWeb3: false,
-    isLoggedIn: false,
-    isLockedAccount: false,
-  },
+  initialState: () => {hasWeb3: false, isLockedAccount: false},
   didMount: self => {
     let getWeb3StatusIntervalId =
       Js.Global.setInterval(
