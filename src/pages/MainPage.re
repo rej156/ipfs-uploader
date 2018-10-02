@@ -6,24 +6,21 @@ let make = _children => {
   ...component,
   render: _self =>
     <div>
-      <BrowserWeb3Capabilities>
+      <BrowserWeb3Capabilities
+        isLoggedIn=true
+        loggedInAddress="0xbfecec47dd8bf5f6264a9830a9d26ef387c38a67">
         ...{
-             ({hasWeb3, isLockedAccount}) =>
-               <div>
-                 <p>
-                   ("hasWeb3 " ++ hasWeb3->string_of_bool)->ReasonReact.string
-                 </p>
-                 <p>
-                   ("isLockedAccount " ++ isLockedAccount->string_of_bool)
-                   ->ReasonReact.string
-                 </p>
-               </div>
+             (
+               {
+                 hasWeb3,
+                 isLockedAccount,
+                 isCurrentWeb3AddressSameAsLoggedInAddress,
+                 currentNetworkName,
+               },
+             ) =>
+               <div /* ... */ />
            }
       </BrowserWeb3Capabilities>
-      <h1> {text("Hi people")} </h1>
-      <p> {text("Welcome to your new Gatsby site.")} </p>
-      <p> {text("Now go build something great.")} </p>
-      <GatsbyLink to_="/page-2/"> {text("Go to page 2")} </GatsbyLink>
     </div>,
 };
 
