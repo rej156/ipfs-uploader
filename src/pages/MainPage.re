@@ -18,7 +18,7 @@ let make = _children => {
                  currentNetworkName,
                },
              ) =>
-               <div /* ... */ />
+               <div> <p> "has Web3"->ReasonReact.string </p> </div>
            }
       </BrowserWeb3Capabilities>
     </div>,
