@@ -1,16 +1,24 @@
-import './index.css'
-
-import IndexLayout from './IndexLayout.re'
 import React from 'react'
+import PropTypes from 'prop-types'
+import { StaticQuery, graphql } from 'gatsby'
 
-export default IndexLayout
-
-export const query = graphql`
-  query SiteTitleQuery {
-    site {
-      siteMetadata {
-        title
+const Layout = ({ children }) => (
+  <StaticQuery
+    query={graphql`
+      query SiteTitleQuery {
+        site {
+          siteMetadata {
+            title
+          }
+        }
       }
-    }
-  }
-`
+    `}
+    render={data => children(data)}
+  />
+)
+
+Layout.propTypes = {
+  children: PropTypes.func.isRequired,
+}
+
+export default Layout
