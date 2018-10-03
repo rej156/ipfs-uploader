@@ -201,4 +201,8 @@ export default () => {
       uppy.close()
     }, 400)
   })
+
+  uppy.run()
+  uppy.getPlugin('Dashboard').openModal()
+  return uppy
 }

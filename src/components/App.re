@@ -11,7 +11,6 @@ let meta = [|
 
 let make = (~data, _children) => {
   ...component,
-  didMount: _ => initUppy(),
   render: _self =>
     <div>
       <Helmet title=data##site##siteMetadata##title meta>
@@ -31,7 +30,9 @@ let make = (~data, _children) => {
                </p>
            }
       </BrowserWeb3Capabilities>
-      <button id="select-files"> "CLICK ME"->ReasonReact.string </button>
+      <button onClick={_ => initUppy()} id="select-files">
+        "CLICK ME"->ReasonReact.string
+      </button>
       <GatsbyLink
         style={ReactDOMRe.Style.make(~margin="0", ())} to_="/page-2">
         {ReasonReact.string("GatsbyLink To Page 2")}
