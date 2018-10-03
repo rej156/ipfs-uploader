@@ -2,10 +2,11 @@ const Uppy = require('@uppy/core')
 const { Plugin } = require('@uppy/core')
 const Dashboard = require('@uppy/dashboard')
 const settle = require('@uppy/utils/lib/settle')
+const Webcam = require('@uppy/webcam')
+// const Url = require('@uppy/url')
 const IPFS = require('ipfs-api')
 
 const ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' })
-// const limitPromises = require('@uppy/utils/lib/limitPromises')
 
 const uppyConfig = {
   debug: true,
@@ -13,7 +14,6 @@ const uppyConfig = {
   restrictions: {
     maxNumberOfFiles: 1,
     minNumberOfFiles: 1,
-    allowedFileTypes: ['image/png', 'image/jpeg', 'image/jpg'],
   },
 }
 
@@ -181,11 +181,28 @@ class IPFSUploader extends Plugin {
 
 export default () => {
   const uppy = Uppy(uppyConfig)
+    .use(Webcam, {
+      onBeforeSnapshot: () => Promise.resolve(),
+      countdown: false,
+      modes: ['video-audio', 'video-only', 'audio-only', 'picture'],
+      mirror: true,
+      facingMode: 'user',
+      locale: {},
+    })
+    // TODO: Deploy serverless uppy companion server
+    // .use(Url, {
+    //   serverUrl: 'https://server.uppy.io/',
+    //   locale: {},
+    // })
     .use(Dashboard, {
       trigger: '#select-files',
       closeModalOnClickOutside: true,
       showProgressDetails: false,
       proudlyDisplayPoweredByUppy: false,
+      plugins: [
+        'Webcam',
+        // , 'Url'
+      ],
     })
     .use(IPFSUploader)
 

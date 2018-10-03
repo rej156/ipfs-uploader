@@ -907,11 +907,26 @@
   dependencies:
     "@uppy/utils" "0.27.1"
 
+"@uppy/url@^0.27.5":
+  version "0.27.5"
+  resolved "https://registry.yarnpkg.com/@uppy/url/-/url-0.27.5.tgz#35479347027ab5ae6c38834692d56e64cef890b4"
+  dependencies:
+    "@uppy/companion-client" "0.27.2"
+    "@uppy/utils" "0.27.1"
+    preact "^8.2.9"
+
 "@uppy/utils@0.27.1":
   version "0.27.1"
   resolved "https://registry.yarnpkg.com/@uppy/utils/-/utils-0.27.1.tgz#53e610d4e5eebc5ecd722f4d711fe4ff20f2d19c"
   dependencies:
     lodash.throttle "^4.1.1"
+
+"@uppy/webcam@^0.27.4":
+  version "0.27.4"
+  resolved "https://registry.yarnpkg.com/@uppy/webcam/-/webcam-0.27.4.tgz#7403363ef718e7528928659af211aaa9650f686a"
+  dependencies:
+    "@uppy/utils" "0.27.1"
+    preact "^8.2.9"
 
 "@uppy/xhr-upload@^0.27.4":
   version "0.27.4"
