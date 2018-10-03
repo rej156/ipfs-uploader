@@ -49,6 +49,45 @@ class MyPlugin extends Plugin {
     return settle(promises)
   }
 
+  createProgressTimeout(timeout, timeoutHandler) {
+    const uppy = this.uppy
+    const self = this
+    let isDone = false
+
+    function onTimedOut() {
+      uppy.log(`[XHRUpload] timed out`)
+      const error = new Error(`timedOut: ${Math.ceil(timeout / 1000)}`)
+      timeoutHandler(error)
+    }
+
+    let aliveTimer = null
+    function progress() {
+      // Some browsers fire another progress event when the upload is
+      // cancelled, so we have to ignore progress after the timer was
+      // told to stop.
+      if (isDone) return
+
+      if (timeout > 0) {
+        if (aliveTimer) clearTimeout(aliveTimer)
+        aliveTimer = setTimeout(onTimedOut, timeout)
+      }
+    }
+
+    function done() {
+      uppy.log(`[IPFSUpload] timer done`)
+      if (aliveTimer) {
+        clearTimeout(aliveTimer)
+        aliveTimer = null
+      }
+      isDone = true
+    }
+
+    return {
+      progress,
+      done,
+    }
+  }
+
   upload(file, current, total) {
     return new Promise((resolve, reject) => {
       this.uppy.log(`uploading ${current} of ${total}`)
@@ -57,6 +96,14 @@ class MyPlugin extends Plugin {
 
       console.log(reader)
       reader.readAsArrayBuffer(file.data)
+
+      const timer = this.createProgressTimeout(10000, error => {
+        this.uppy.emit('upload-error', file, error)
+        reject(error)
+      })
+      this.uppy.log(`[IPFSUpload] ${file.id} started`)
+      timer.progress()
+
       const saveToIpfs = reader => {
         const buffer = Buffer.from(reader.result)
         ipfs
@@ -66,11 +113,16 @@ class MyPlugin extends Plugin {
           .then(res => {
             console.log(res)
             let ipfsFile = res[0]
+            const body = ipfsFile
             console.log(ipfsFile)
             this.uppy.log(`IPFS Upload of file ${ipfsFile.id} finished.`)
 
+            const uploadURL = `https://gateway.ipfs.io/ipfs/${ipfsFile.hash}`
+
             const response = {
               status: 200,
+              body,
+              uploadURL,
             }
 
             this.uppy.setFileState(file.id, { response })
@@ -80,6 +132,14 @@ class MyPlugin extends Plugin {
             this.uppy.on('upload-cancel', fileID => {})
 
             this.uppy.on('cancel-all', () => {})
+            this.uppy.emit('upload-progress', file, {
+              uploader: this,
+              bytesUploaded: file.size,
+              bytesTotal: file.size,
+            })
+
+            this.uppy.emit('upload-success', file, body, uploadURL)
+            timer.done()
             resolve(ipfsFile)
           })
           .catch(err => {
@@ -125,13 +185,19 @@ export default () => {
   const uppy = Uppy()
     .use(Dashboard, {
       trigger: '#select-files',
+      closeModalOnClickOutside: true,
+      showProgressDetails: false,
+      proudlyDisplayPoweredByUppy: false,
     })
     .use(MyPlugin)
 
   uppy.on('complete', result => {
     console.log(result)
     console.log(
-      `Upload complete! We’ve uploaded these files: ${result.successful}`
+      `Upload complete! We’ve uploaded these files: ${JSON.stringify(
+        result.successful
+      )}`
     )
+    setTimeout(() => uppy.getPlugin('Dashboard').closeModal(), 400)
   })
 }
