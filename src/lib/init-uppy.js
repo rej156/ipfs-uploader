@@ -7,7 +7,17 @@ const IPFS = require('ipfs-api')
 const ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' })
 // const limitPromises = require('@uppy/utils/lib/limitPromises')
 
-class MyPlugin extends Plugin {
+const uppyConfig = {
+  debug: true,
+  autoProceed: true,
+  restrictions: {
+    maxNumberOfFiles: 1,
+    minNumberOfFiles: 1,
+    allowedFileTypes: ['image/png', 'image/jpeg', 'image/jpg'],
+  },
+}
+
+class IPFSUploader extends Plugin {
   constructor(uppy, opts) {
     super(uppy, opts)
     this.id = 'IPFSUploader'
@@ -25,17 +35,9 @@ class MyPlugin extends Plugin {
       const current = parseInt(i, 10) + 1
       const total = files.length
 
-      console.log(this)
-
       if (file.error) {
         return () => Promise.reject(new Error(file.error))
-      } else if (file.isRemote) {
-        // We emit upload-started here, so that it's also emitted for files
-        // that have to wait due to the `limit` option.
-        this.uppy.emit('upload-started', file)
-        return this.uploadRemote.bind(this, file, current, total)
       } else {
-        console.log(this)
         this.uppy.emit('upload-started', file)
         return this.upload.bind(this, file, current, total)
       }
@@ -51,7 +53,6 @@ class MyPlugin extends Plugin {
 
   createProgressTimeout(timeout, timeoutHandler) {
     const uppy = this.uppy
-    const self = this
     let isDone = false
 
     function onTimedOut() {
@@ -93,8 +94,6 @@ class MyPlugin extends Plugin {
       this.uppy.log(`uploading ${current} of ${total}`)
       console.log(file)
       const reader = new FileReader()
-
-      console.log(reader)
       reader.readAsArrayBuffer(file.data)
 
       const timer = this.createProgressTimeout(10000, error => {
@@ -108,14 +107,14 @@ class MyPlugin extends Plugin {
         const buffer = Buffer.from(reader.result)
         ipfs
           .add(buffer, {
-            progress: prog => console.log(`received: ${prog}`),
+            progress: progress => console.log(`received: ${progress}`),
           })
           .then(res => {
             console.log(res)
             let ipfsFile = res[0]
             const body = ipfsFile
             console.log(ipfsFile)
-            this.uppy.log(`IPFS Upload of file ${ipfsFile.id} finished.`)
+            this.uppy.log(`IPFS Upload of file ${file.id} finished.`)
 
             const uploadURL = `https://gateway.ipfs.io/ipfs/${ipfsFile.hash}`
 
@@ -158,7 +157,6 @@ class MyPlugin extends Plugin {
 
   install() {
     this.uppy.addUploader(fileIDs => {
-      console.log(this)
       if (fileIDs.length === 0) {
         this.uppy.log('[XHRUpload] No files to upload!')
         return Promise.resolve()
@@ -182,14 +180,14 @@ class MyPlugin extends Plugin {
 }
 
 export default () => {
-  const uppy = Uppy()
+  const uppy = Uppy(uppyConfig)
     .use(Dashboard, {
       trigger: '#select-files',
       closeModalOnClickOutside: true,
       showProgressDetails: false,
       proudlyDisplayPoweredByUppy: false,
     })
-    .use(MyPlugin)
+    .use(IPFSUploader)
 
   uppy.on('complete', result => {
     console.log(result)
@@ -198,6 +196,9 @@ export default () => {
         result.successful
       )}`
     )
-    setTimeout(() => uppy.getPlugin('Dashboard').closeModal(), 400)
+    setTimeout(() => {
+      uppy.getPlugin('Dashboard').closeModal()
+      uppy.close()
+    }, 400)
   })
 }
