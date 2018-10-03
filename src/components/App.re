@@ -1,3 +1,5 @@
+[@bs.module "../lib/init-uppy.js"] external initUppy: unit => unit = "default";
+
 let component = ReasonReact.statelessComponent("App");
 
 type data = {. "site": {. "siteMetadata": {. "title": string}}};
@@ -9,9 +11,15 @@ let meta = [|
 
 let make = (~data, _children) => {
   ...component,
+  didMount: _ => initUppy(),
   render: _self =>
     <div>
-      <Helmet title=data##site##siteMetadata##title meta />
+      <Helmet title=data##site##siteMetadata##title meta>
+        <link
+          href="https://transloadit.edgly.net/releases/uppy/v0.27.5/dist/uppy.min.css"
+          rel="stylesheet"
+        />
+      </Helmet>
       <Header siteTitle=data##site##siteMetadata##title />
       <BrowserWeb3Capabilities isLoggedIn=true loggedInAddress="123456789">
         ...{
@@ -23,6 +31,7 @@ let make = (~data, _children) => {
                </p>
            }
       </BrowserWeb3Capabilities>
+      <button id="select-files"> "CLICK ME"->ReasonReact.string </button>
       <GatsbyLink
         style={ReactDOMRe.Style.make(~margin="0", ())} to_="/page-2">
         {ReasonReact.string("GatsbyLink To Page 2")}

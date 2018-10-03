@@ -3,5 +3,5 @@ node_modules
 yarn-error.log
 .merlin
 /public
-lib
+lib/**/**
 src/**/*.bs.js
