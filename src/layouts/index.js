@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { StaticQuery, graphql } from 'gatsby'
+import { withPrefix, StaticQuery, graphql } from 'gatsby'
+import { Helmet } from 'react-helmet'
 
 const Layout = ({ children }) => (
   <StaticQuery
@@ -13,7 +14,14 @@ const Layout = ({ children }) => (
         }
       }
     `}
-    render={data => children(data)}
+    render={data => (
+      <div>
+        <Helmet>
+          <script src={withPrefix('/3box.js')} type="text/javascript" />
+        </Helmet>
+        {children(data)}
+      </div>
+    )}
   />
 )
 

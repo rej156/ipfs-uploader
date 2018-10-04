@@ -10,7 +10,6 @@
     "@uppy/webcam": "^0.27.4",
     "@uppy/xhr-upload": "^0.27.4",
     "bs-platform": "^4.0.6",
-    "cuid": "^2.1.4",
     "gatsby": "^2.0.0-rc.28",
     "gatsby-link": "^2.0.0-rc.4",
     "gatsby-link-reason": "^1.1.0",

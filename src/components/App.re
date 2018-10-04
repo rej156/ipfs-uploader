@@ -1,3 +1,5 @@
+type web3 = {. "eth": {. "accounts": array(string)}};
+[@bs.val] external web3: web3 = "window.web3";
 [@bs.module "../lib/init-uppy.js"] external initUppy: unit => unit = "default";
 
 let component = ReasonReact.statelessComponent("App");
@@ -31,6 +33,9 @@ let make = (~data, _children) => {
            }
       </BrowserWeb3Capabilities>
       <button onClick={_ => initUppy()} id="select-files">
+        "CLICK ME"->ReasonReact.string
+      </button>
+      <button onClick={_ => Js.log(1)} id="select-files">
         "CLICK ME"->ReasonReact.string
       </button>
       <GatsbyLink

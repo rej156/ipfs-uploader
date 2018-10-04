@@ -9,6 +9,7 @@ const IPFS = require('ipfs-api')
 const ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' })
 
 const uppyConfig = {
+  timeout: 10000000,
   debug: true,
   autoProceed: true,
   restrictions: {
@@ -96,7 +97,7 @@ class IPFSUploader extends Plugin {
       const reader = new FileReader()
       reader.readAsArrayBuffer(file.data)
 
-      const timer = this.createProgressTimeout(10000, error => {
+      const timer = this.createProgressTimeout(uppyConfig.timeout, error => {
         this.uppy.emit('upload-error', file, error)
         reject(error)
       })
