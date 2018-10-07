@@ -5,3 +5,4 @@ yarn-error.log
 /public
 lib/**/**
 src/**/*.bs.js
+cypress.env.json
