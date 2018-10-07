@@ -1,5 +1,3 @@
-type web3 = {. "eth": {. "accounts": array(string)}};
-[@bs.val] external web3: web3 = "window.web3";
 [@bs.module "../lib/init-uppy.js"] external initUppy: unit => unit = "default";
 
 let component = ReasonReact.statelessComponent("App");
@@ -35,8 +33,24 @@ let make = (~data, _children) => {
       <button onClick={_ => initUppy()} id="select-files">
         "CLICK ME"->ReasonReact.string
       </button>
-      <button onClick={_ => Js.log(1)} id="select-files">
-        "CLICK ME"->ReasonReact.string
+      <button
+        onClick={
+          _ =>
+            ThreeBox.openBox(
+              ThreeBox.web3##eth##accounts[0],
+              ThreeBox.web3##currentProvider,
+            )
+            |> Js.Promise.then_(value => {
+                 Js.log(value);
+                 Js.Promise.resolve();
+               })
+            |> Js.Promise.catch(err => {
+                 Js.log2("Failure!!", err);
+                 Js.Promise.resolve();
+               })
+            |> ignore
+        }>
+        "LOGIN"->ReasonReact.string
       </button>
       <GatsbyLink
         style={ReactDOMRe.Style.make(~margin="0", ())} to_="/page-2">
