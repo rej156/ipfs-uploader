@@ -10,7 +10,6 @@
     "@uppy/webcam": "^0.27.4",
     "@uppy/xhr-upload": "^0.27.4",
     "bs-platform": "^4.0.6",
-    "cypress": "^3.1.0",
     "gatsby": "^2.0.0-rc.28",
     "gatsby-link": "^2.0.0-rc.4",
     "gatsby-link-reason": "^1.1.0",
@@ -18,9 +17,7 @@
     "gatsby-plugin-reason": "^2.0.0-alpha.1",
     "ipfs-api": "^24.0.2",
     "react-helmet": "^5.2.0",
-    "reason-react": "^0.5.3",
-    "truffle-privatekey-provider": "^0.1.0",
-    "web3": "0.20.3"
+    "reason-react": "^0.5.3"
   },
   "repository": {
     "url": "https://github.com/jtberglund/gatsby-starter-reason"
