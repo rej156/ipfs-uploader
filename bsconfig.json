@@ -2,7 +2,11 @@
   "name": "gatsby-starter-reason",
   "namespace": true,
   "reason": { "react-jsx": 2 },
-  "bs-dependencies": ["reason-react", "gatsby-link-reason"],
+  "bs-dependencies": [
+    "reason-react",
+    "gatsby-link-reason",
+    "@aantron/repromise"
+  ],
   "sources": [
     {
       "dir": "src",

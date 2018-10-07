@@ -2,18 +2,23 @@
 # yarn lockfile v1
 
 
-"3box@^1.0.0-beta-5":
-  version "1.0.0-beta-5"
-  resolved "https://registry.yarnpkg.com/3box/-/3box-1.0.0-beta-5.tgz#04cd665227d7b87adf3739bc42fd9e2a552e8296"
+"3box@^1.0.0-beta-7":
+  version "1.0.0-beta-7"
+  resolved "https://registry.yarnpkg.com/3box/-/3box-1.0.0-beta-7.tgz#04fdf34b7339da5794498a94debe7aeec20403e3"
   dependencies:
     bip39 "^2.5.0"
     ipfs "^0.32.2"
     ipfs-api "^24.0.0"
+    ipfs-pubsub-room "^1.4.0"
     js-sha256 "^0.9.0"
     muport-core "^0.4.1"
     orbit-db "^0.19.9"
     store "^2.0.12"
     xmlhttprequest "^1.8.0"
+
+"@aantron/repromise@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@aantron/repromise/-/repromise-0.6.0.tgz#45bea66e593b7e0f968bc0fd03f0b6578003e698"
 
 "@babel/code-frame@7.0.0-beta.44":
   version "7.0.0-beta.44"
@@ -2102,8 +2107,8 @@ bl@^1.0.0:
     safe-buffer "^5.1.1"
 
 bl@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/bl/-/bl-2.0.1.tgz#1de8346d50c3078d088d6a60c2bbc8c516248bc5"
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/bl/-/bl-2.1.0.tgz#e5dba41d9be27eb3cb48ed53463cabd025b2a70e"
   dependencies:
     readable-stream "^2.3.5"
     safe-buffer "^5.1.1"
@@ -3258,7 +3263,7 @@ csstype@^2.2.0:
   version "2.5.7"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.5.7.tgz#bf9235d5872141eccfb2d16d82993c6b149179ff"
 
-cuid@^2.1.1, cuid@^2.1.4:
+cuid@^2.1.1:
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/cuid/-/cuid-2.1.4.tgz#e1178eb92a05ef9364b29a9942feed36d3604cdd"
 
@@ -5614,6 +5619,14 @@ human-to-milliseconds@^1.0.0:
   dependencies:
     promisify-es6 "^1.0.3"
 
+hyperdiff@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/hyperdiff/-/hyperdiff-2.0.5.tgz#14bf60779fb1e46468929aa79b95d66b7e9f8844"
+  dependencies:
+    debug "~3.1.0"
+    lodash.clonedeep "~4.5.0"
+    lodash.pullat "~4.6.0"
+
 iconv-lite@0.4.19:
   version "0.4.19"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.19.tgz#f7468f60135f5e5dad3399c0a81be9a1603a082b"
@@ -5993,6 +6006,15 @@ ipfs-pubsub-peer-monitor@~0.0.5:
   resolved "https://registry.yarnpkg.com/ipfs-pubsub-peer-monitor/-/ipfs-pubsub-peer-monitor-0.0.8.tgz#8972676247e6a7d1901e27dcfe11cbd0aecaa1c6"
   dependencies:
     p-forever "^1.0.1"
+
+ipfs-pubsub-room@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/ipfs-pubsub-room/-/ipfs-pubsub-room-1.4.0.tgz#78c7f22f07b05a90121225f3e3800af5d63f04f7"
+  dependencies:
+    hyperdiff "^2.0.5"
+    lodash.clonedeep "^4.5.0"
+    pull-pushable "^2.2.0"
+    pull-stream "^3.6.8"
 
 ipfs-repo@~0.24.0:
   version "0.24.0"
@@ -7460,6 +7482,10 @@ lodash.camelcase@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/lodash.camelcase/-/lodash.camelcase-4.3.0.tgz#b28aa6288a2b9fc651035c7711f65ab6190331a6"
 
+lodash.clonedeep@^4.5.0, lodash.clonedeep@~4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
+
 lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
@@ -7547,6 +7573,10 @@ lodash.padstart@^4.6.1:
 lodash.pullallwith@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/lodash.pullallwith/-/lodash.pullallwith-4.7.0.tgz#657e4200710d8b59d694ee5213662ae0511d1170"
+
+lodash.pullat@~4.6.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/lodash.pullat/-/lodash.pullat-4.6.0.tgz#bdfacf0e209fd27f965e711fa65a774a84d30261"
 
 lodash.range@^3.2.0:
   version "3.2.0"

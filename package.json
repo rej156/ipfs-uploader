@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "author": "Jeremy Berglund",
   "dependencies": {
+    "3box": "^1.0.0-beta-7",
+    "@aantron/repromise": "^0.6.0",
     "@uppy/core": "^0.27.3",
     "@uppy/dashboard": "^0.27.5",
     "@uppy/url": "^0.27.5",

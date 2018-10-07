@@ -56,16 +56,13 @@ let make = (~data, _children) => {
               ThreeBox.web3##eth##accounts[0],
               ThreeBox.web3##currentProvider,
             )
-            |> Js.Promise.then_(value => {
+            |> Repromise.andThen(value => {
+                 Js.log(value);
                  self.send(SetLoggedIn(true));
                  self.send(SetThreeBox(value));
-                 Js.Promise.resolve();
+                 Repromise.resolved(value);
                })
-            |> Js.Promise.catch(err => {
-                 Js.log2("Failure!!", err);
-                 Js.Promise.resolve();
-               })
-            |> ignore
+            |> Repromise.wait(Js.log)
         }>
         "LOGIN"->ReasonReact.string
       </button>
