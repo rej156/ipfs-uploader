@@ -1,0 +1,1 @@
+src/App-MyApp.cmj : src/BrowserWeb3Capabilities-MyApp.cmj src/lib/ThreeBox-MyApp.cmj

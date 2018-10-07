@@ -1,0 +1,23 @@
+{
+  "name": "my-app",
+  "namespace": true,
+  "reason": { "react-jsx": 2 },
+  "bs-dependencies": [
+    "reason-react",
+    "@aantron/repromise"
+  ],
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    }
+  ],
+  "package-specs": [
+    {
+      "module": "commonjs",
+      "in-source": true
+    }
+  ],
+  "suffix": ".bs.js",
+  "refmt": 3
+}
