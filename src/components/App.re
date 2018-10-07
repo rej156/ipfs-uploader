@@ -1,6 +1,14 @@
 [@bs.module "../lib/init-uppy.js"] external initUppy: unit => unit = "default";
 
-let component = ReasonReact.statelessComponent("App");
+type state = {
+  isLoggedIn: bool,
+  threeBox: Js.Nullable.t(ThreeBox.threeBox),
+};
+
+type action =
+  | SetLoggedIn(bool)
+  | SetThreeBox(ThreeBox.threeBox);
+let component = ReasonReact.reducerComponent("App");
 
 type data = {. "site": {. "siteMetadata": {. "title": string}}};
 
@@ -11,7 +19,15 @@ let meta = [|
 
 let make = (~data, _children) => {
   ...component,
-  render: _self =>
+  initialState: () => {isLoggedIn: false, threeBox: Js.Nullable.undefined},
+  reducer: (action, state) =>
+    switch (action) {
+    | SetLoggedIn(status) =>
+      ReasonReact.Update({...state, isLoggedIn: status})
+    | SetThreeBox(threeBox) =>
+      ReasonReact.Update({...state, threeBox: Js.Nullable.return(threeBox)})
+    },
+  render: self =>
     <div>
       <Helmet title=data##site##siteMetadata##title meta>
         <link
@@ -20,16 +36,16 @@ let make = (~data, _children) => {
         />
       </Helmet>
       <Header siteTitle=data##site##siteMetadata##title />
-      <BrowserWeb3Capabilities isLoggedIn=true loggedInAddress="123456789">
-        ...{
-             ({hasWeb3}) =>
-               <p>
-                 "Have you seen a component HMR this quick"->ReasonReact.string
-                 <br />
-                 ("OCaml ftw " ++ hasWeb3->string_of_bool)->ReasonReact.string
-               </p>
-           }
+      <BrowserWeb3Capabilities
+        isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
+        ...{_ => <p> "HEY"->ReasonReact.string </p>}
       </BrowserWeb3Capabilities>
+      <p>
+        "isLoggedIn status"->ReasonReact.string
+        <br />
+        ("OCaml ftw " ++ self.state.isLoggedIn->string_of_bool)
+        ->ReasonReact.string
+      </p>
       <button onClick={_ => initUppy()} id="select-files">
         "CLICK ME"->ReasonReact.string
       </button>
@@ -41,7 +57,8 @@ let make = (~data, _children) => {
               ThreeBox.web3##currentProvider,
             )
             |> Js.Promise.then_(value => {
-                 Js.log(value);
+                 self.send(SetLoggedIn(true));
+                 self.send(SetThreeBox(value));
                  Js.Promise.resolve();
                })
             |> Js.Promise.catch(err => {
@@ -51,6 +68,21 @@ let make = (~data, _children) => {
             |> ignore
         }>
         "LOGIN"->ReasonReact.string
+      </button>
+      <button
+        onClick={
+          _ =>
+            Belt.Option.mapWithDefault(
+              Js.Nullable.toOption(self.state.threeBox),
+              _ => Js.log("NO THREE BOX"),
+              threeBox => {
+                Js.log(threeBox);
+                ThreeBox.logout(threeBox);
+              },
+              (),
+            )
+        }>
+        "LOGOUT"->ReasonReact.string
       </button>
       <GatsbyLink
         style={ReactDOMRe.Style.make(~margin="0", ())} to_="/page-2">

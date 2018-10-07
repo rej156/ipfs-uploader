@@ -7,4 +7,6 @@ type web3 = {
 };
 [@bs.val] external web3: web3 = "window.web3";
 [@bs.val "window.ThreeBox.openBox"]
-external openBox: (string, web3Provider) => Js.Promise.t(bool) = "";
+external openBox: (string, web3Provider) => Js.Promise.t(threeBox) = "";
+
+[@bs.send] external logout: (threeBox, unit) => unit = "logout";
