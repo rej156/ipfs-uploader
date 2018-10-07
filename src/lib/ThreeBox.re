@@ -1,4 +1,9 @@
-type threeBox;
+type threeBox = {
+  .
+  "logout": unit => Js.Promise.t(unit),
+  "private_": {. "set": (string, string) => Js.Promise.t(bool)},
+};
+
 type web3Provider;
 type web3 = {
   .

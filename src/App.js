@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import Lol from './App.bs'
+import IPFSUploader from './App.bs'
 import './App.css';
 
 class App extends Component {
@@ -9,20 +9,10 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <link href="https://transloadit.edgly.net/releases/uppy/v0.27.5/dist/uppy.min.css" rel="stylesheet"></link>
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <Lol />
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
+          <IPFSUploader />
         </header>
       </div>
     );

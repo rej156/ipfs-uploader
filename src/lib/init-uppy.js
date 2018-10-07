@@ -180,7 +180,7 @@ class IPFSUploader extends Plugin {
   }
 }
 
-export default () => {
+export default (callback) => {
   const uppy = Uppy(uppyConfig)
     .use(Webcam, {
       onBeforeSnapshot: () => Promise.resolve(),
@@ -209,6 +209,9 @@ export default () => {
 
   uppy.on('complete', result => {
     console.log(result)
+    const gatewayIPFS = result.successful[0].uploadURL
+    console.log(gatewayIPFS)
+    typeof callback === 'function' && callback(gatewayIPFS)
     console.log(
       `Upload complete! We’ve uploaded these files: ${JSON.stringify(
         result.successful
