@@ -1,14 +1,22 @@
 const prefix = (key) => `ifpsUploader.${key}`
 
-const setPrivateStore = (box, { name, value }) => box.private.set(name, value)
-
 const setFiles = (box, callback) => value =>
   box.private.set(prefix('files'), value)
     .then(res => (res && typeof callback === 'function' && callback()))
-  
-const addFile = (box, ipfsHash, callback) =>
+
+const getFiles = (box) =>
   box.private.get(prefix('files'))
     .then(JSON.parse)
+
+const setFileProperty = (box, ipfsHash, name, value) =>
+  box.private.set(prefix(`files[${ipfsHash}].${name}`), value)
+
+const setFileName = (box, ipfsHash, fileName) => setFileProperty(box, ipfsHash, 'name', fileName)
+
+const setFileDate = (box, ipfsHash, fileName) => setFileProperty(box, ipfsHash, 'date', Date.now().toString())
+
+const addFile = (box, ipfsHash, callback) =>
+  getFiles(box)
     .then(files => {
       if (Array.isArray(files)) {
         const newFiles = files
@@ -20,3 +28,10 @@ const addFile = (box, ipfsHash, callback) =>
     })
     .then(JSON.stringify)
     .then(setFiles(box, callback))
+
+export {
+  setFileName,
+  setFileDate,
+  addFile,
+  getFiles
+}
