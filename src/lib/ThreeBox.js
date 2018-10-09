@@ -13,7 +13,7 @@ const setFileProperty = (box, ipfsHash, name, value) =>
 
 const setFileName = (box, ipfsHash, fileName) => setFileProperty(box, ipfsHash, 'name', fileName)
 
-const setFileDate = (box, ipfsHash, fileName) => setFileProperty(box, ipfsHash, 'date', Date.now().toString())
+const setFileDate = (box, ipfsHash) => setFileProperty(box, ipfsHash, 'date', Date.now().toString())
 
 const addFile = (box, ipfsHash, callback) =>
   getFiles(box)
