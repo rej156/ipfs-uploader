@@ -13,18 +13,18 @@ let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
   ...component,
-  /* didMount: self =>
-     ThreeBox.openBox(
-       ThreeBox.web3##eth##accounts[0],
-       ThreeBox.web3##currentProvider,
-     )
-     |> Js.Promise.then_(value => {
-          Js.log(value);
-          self.send(SetLoggedIn(true));
-          self.send(SetThreeBox(value));
-          Js.Promise.resolve(value);
-        })
-     |> ignore, */
+  didMount: self =>
+    ThreeBox.openBox(
+      ThreeBox.web3##eth##accounts[0],
+      ThreeBox.web3##currentProvider,
+    )
+    |> Js.Promise.then_(value => {
+         Js.log(value);
+         self.send(SetLoggedIn(true));
+         self.send(SetThreeBox(value));
+         Js.Promise.resolve(value);
+       })
+    |> ignore,
   initialState: () => {isLoggedIn: false, threeBox: Js.Nullable.undefined},
   reducer: (action, state) =>
     switch (action) {
