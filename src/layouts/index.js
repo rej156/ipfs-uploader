@@ -17,7 +17,7 @@ const Layout = ({ children }) => (
     render={data => (
       <div>
         <Helmet>
-          <script src={'/3box.js'} type="text/javascript" />
+          <script src={'/3box.min.js'} type="text/javascript" />
         </Helmet>
         {children(data)}
       </div>
