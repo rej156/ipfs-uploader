@@ -8,3 +8,8 @@ export const storeFile = (box, ipfsHash) =>
       .set(prefixKey('files'), newFiles)
       .then(result => console.log(result))
   })
+
+export const fetchFiles = (box, callback) =>
+  box.private.get(prefixKey('files')).then(files => {
+    typeof callback === 'function' && callback(files)
+  })

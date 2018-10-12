@@ -4,9 +4,14 @@ external initUppy: (string => unit) => unit = "default";
 [@bs.module "../lib/Store.js"]
 external storeFile: (ThreeBox.threeBox, string) => unit = "storeFile";
 
+[@bs.module "../lib/Store.js"]
+external fetchFiles: (ThreeBox.threeBox, array(string) => unit) => unit =
+  "fetchFiles";
+
 type state = {
   isLoggedIn: bool,
   ipfsHash: string,
+  files: array(string),
   threeBox: Js.Nullable.t(ThreeBox.threeBox),
 };
 
@@ -14,6 +19,8 @@ type action =
   | SetLoggedIn(bool)
   | Logout
   | PersistFile(string)
+  | SetFiles(array(string))
+  | FetchFiles
   | SetThreeBox(ThreeBox.threeBox);
 let component = ReasonReact.reducerComponent("App");
 
@@ -24,17 +31,41 @@ let meta = [|
   Helmet.metaField(~name="keywords", ~content="sample, something"),
 |];
 
+let extractBox = (threeBox, callback) =>
+  Belt.Option.mapWithDefault(
+    Js.Nullable.toOption(threeBox),
+    (),
+    box => {
+      Js.log(box);
+      callback(box);
+    },
+  );
+
 let make = (~data, _children) => {
   ...component,
   initialState: () => {
     isLoggedIn: false,
     threeBox: Js.Nullable.undefined,
     ipfsHash: "",
+    files: [||],
   },
   reducer: (action, state) =>
     switch (action) {
     | SetLoggedIn(status) =>
-      ReasonReact.Update({...state, isLoggedIn: status})
+      ReasonReact.UpdateWithSideEffects(
+        {...state, isLoggedIn: status},
+        (self => self.send(FetchFiles)),
+      )
+    | SetFiles(files) => ReasonReact.Update({...state, files})
+    | FetchFiles =>
+      ReasonReact.SideEffects(
+        (
+          self =>
+            extractBox(self.state.threeBox, box =>
+              fetchFiles(box, files => self.send(SetFiles(files)))
+            )
+        ),
+      )
     | SetThreeBox(threeBox) =>
       ReasonReact.Update({...state, threeBox: Js.Nullable.return(threeBox)})
     | PersistFile(ipfsHash) =>
@@ -42,31 +73,19 @@ let make = (~data, _children) => {
         {...state, ipfsHash},
         (
           self =>
-            Belt.Option.mapWithDefault(
-              Js.Nullable.toOption(self.state.threeBox),
-              _ => Js.log("NO THREE BOX"),
-              threeBox => {
-                Js.log(threeBox);
-                storeFile(threeBox, ipfsHash);
-                _ => ();
-              },
-              (),
-            )
+            extractBox(self.state.threeBox, box => storeFile(box, ipfsHash))
         ),
       )
     | Logout =>
       ReasonReact.SideEffects(
         (
           self =>
-            Belt.Option.mapWithDefault(
-              Js.Nullable.toOption(self.state.threeBox),
-              _ => Js.log("NO THREE BOX"),
-              threeBox => {
-                Js.log(threeBox);
+            extractBox(
+              self.state.threeBox,
+              box => {
                 self.send(SetLoggedIn(false));
-                ThreeBox.logout(threeBox);
+                ThreeBox.logout(box);
               },
-              (),
             )
         ),
       )
@@ -103,8 +122,8 @@ let make = (~data, _children) => {
               ThreeBox.web3##currentProvider,
             )
             |> Repromise.andThen(value => {
-                 self.send(SetLoggedIn(true));
                  self.send(SetThreeBox(value));
+                 self.send(SetLoggedIn(true));
                  Repromise.resolved(value);
                })
             |> Repromise.wait(Js.log)

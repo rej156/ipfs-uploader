@@ -9,4 +9,4 @@ type web3 = {
 [@bs.val "window.ThreeBox.openBox"]
 external openBox: (string, web3Provider) => Repromise.t(threeBox) = "";
 
-[@bs.send] external logout: (threeBox, unit) => unit = "logout";
+[@bs.send] external logout: threeBox => unit = "logout";
