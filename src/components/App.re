@@ -103,6 +103,11 @@ let make = (~data, _children) => {
         isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
         ...{_ => <p> "HEY"->ReasonReact.string </p>}
       </BrowserWeb3Capabilities>
+      {
+        self.state.files
+        ->Belt.Array.map(file => <p key=file> file->ReasonReact.string </p>)
+        |> ReasonReact.array
+      }
       <p>
         "isLoggedIn status"->ReasonReact.string
         <br />
