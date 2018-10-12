@@ -1,13 +1,19 @@
-[@bs.module "../lib/init-uppy.js"] external initUppy: unit => unit = "default";
+[@bs.module "../lib/init-uppy.js"]
+external initUppy: (string => unit) => unit = "default";
+
+[@bs.module "../lib/Store.js"]
+external storeFile: (ThreeBox.threeBox, string) => unit = "storeFile";
 
 type state = {
   isLoggedIn: bool,
+  ipfsHash: string,
   threeBox: Js.Nullable.t(ThreeBox.threeBox),
 };
 
 type action =
   | SetLoggedIn(bool)
   | Logout
+  | PersistFile(string)
   | SetThreeBox(ThreeBox.threeBox);
 let component = ReasonReact.reducerComponent("App");
 
@@ -20,13 +26,34 @@ let meta = [|
 
 let make = (~data, _children) => {
   ...component,
-  initialState: () => {isLoggedIn: false, threeBox: Js.Nullable.undefined},
+  initialState: () => {
+    isLoggedIn: false,
+    threeBox: Js.Nullable.undefined,
+    ipfsHash: "",
+  },
   reducer: (action, state) =>
     switch (action) {
     | SetLoggedIn(status) =>
       ReasonReact.Update({...state, isLoggedIn: status})
     | SetThreeBox(threeBox) =>
       ReasonReact.Update({...state, threeBox: Js.Nullable.return(threeBox)})
+    | PersistFile(ipfsHash) =>
+      ReasonReact.UpdateWithSideEffects(
+        {...state, ipfsHash},
+        (
+          self =>
+            Belt.Option.mapWithDefault(
+              Js.Nullable.toOption(self.state.threeBox),
+              _ => Js.log("NO THREE BOX"),
+              threeBox => {
+                Js.log(threeBox);
+                storeFile(threeBox, ipfsHash);
+                _ => ();
+              },
+              (),
+            )
+        ),
+      )
     | Logout =>
       ReasonReact.SideEffects(
         (
@@ -63,7 +90,9 @@ let make = (~data, _children) => {
         ("OCaml ftw " ++ self.state.isLoggedIn->string_of_bool)
         ->ReasonReact.string
       </p>
-      <button onClick={_ => initUppy()} id="select-files">
+      <button
+        onClick={_ => initUppy(ipfsHash => self.send(PersistFile(ipfsHash)))}
+        id="select-files">
         "CLICK ME"->ReasonReact.string
       </button>
       <button

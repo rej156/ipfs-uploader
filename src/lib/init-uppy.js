@@ -180,7 +180,7 @@ class IPFSUploader extends Plugin {
   }
 }
 
-export default () => {
+export default callback => {
   const uppy = Uppy(uppyConfig)
     .use(Webcam, {
       onBeforeSnapshot: () => Promise.resolve(),
@@ -214,6 +214,7 @@ export default () => {
         result.successful
       )}`
     )
+    typeof callback === 'function' && callback(result.successful[0].uploadURL)
     setTimeout(() => {
       uppy.getPlugin('Dashboard').closeModal()
       uppy.close()
