@@ -7,6 +7,7 @@ type state = {
 
 type action =
   | SetLoggedIn(bool)
+  | Logout
   | SetThreeBox(ThreeBox.threeBox);
 let component = ReasonReact.reducerComponent("App");
 
@@ -26,6 +27,22 @@ let make = (~data, _children) => {
       ReasonReact.Update({...state, isLoggedIn: status})
     | SetThreeBox(threeBox) =>
       ReasonReact.Update({...state, threeBox: Js.Nullable.return(threeBox)})
+    | Logout =>
+      ReasonReact.SideEffects(
+        (
+          self =>
+            Belt.Option.mapWithDefault(
+              Js.Nullable.toOption(self.state.threeBox),
+              _ => Js.log("NO THREE BOX"),
+              threeBox => {
+                Js.log(threeBox);
+                self.send(SetLoggedIn(false));
+                ThreeBox.logout(threeBox);
+              },
+              (),
+            )
+        ),
+      )
     },
   render: self =>
     <div>
@@ -57,7 +74,6 @@ let make = (~data, _children) => {
               ThreeBox.web3##currentProvider,
             )
             |> Repromise.andThen(value => {
-                 Js.log(value);
                  self.send(SetLoggedIn(true));
                  self.send(SetThreeBox(value));
                  Repromise.resolved(value);
@@ -66,19 +82,7 @@ let make = (~data, _children) => {
         }>
         "LOGIN"->ReasonReact.string
       </button>
-      <button
-        onClick={
-          _ =>
-            Belt.Option.mapWithDefault(
-              Js.Nullable.toOption(self.state.threeBox),
-              _ => Js.log("NO THREE BOX"),
-              threeBox => {
-                Js.log(threeBox);
-                ThreeBox.logout(threeBox);
-              },
-              (),
-            )
-        }>
+      <button onClick={_ => self.send(Logout)}>
         "LOGOUT"->ReasonReact.string
       </button>
       <GatsbyLink
