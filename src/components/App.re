@@ -136,47 +136,45 @@ let make = (~data, _children) => {
         />
       </Helmet>
       <Header siteTitle=data##site##siteMetadata##title />
-      /* <BrowserWeb3Capabilities
-           isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
-           ...{_ => <p> "HEY"->ReasonReact.string </p>}
-         </BrowserWeb3Capabilities> */
       {
         Js.Array.length(self.state.files) > 0 ?
           <h3> "Your private list of files"->ReasonReact.string </h3> :
           <h3> "Upload some files!"->ReasonReact.string </h3>
       }
       {
-        self.state.files
-        ->Belt.Array.mapWithIndex((index, file) =>
-            <div key={file##hash ++ index->string_of_int}>
-              <input ariaReadonly=true defaultValue=file##hash />
-              <input
-                onChange={
-                  event =>
-                    self.send(
-                      SetFilename((
-                        index,
-                        ReactEvent.Form.target(event)##value,
-                      )),
-                    )
-                }
-                value=file##name
-              />
-              <button onClick={_ => self.send(RemoveFile(index))}>
-                "X"->ReasonReact.string
-              </button>
-              <button onClick={_ => self.send(SaveFiles)}>
-                "Save"->ReasonReact.string
-              </button>
-              <br />
-            </div>
-          )
-        |> ReasonReact.array
+        Js.Array.length(self.state.files) > 0 ?
+          <div>
+            {
+              self.state.files
+              ->Belt.Array.mapWithIndex((index, file) =>
+                  <div key={file##hash ++ index->string_of_int}>
+                    <input ariaReadonly=true defaultValue=file##hash />
+                    <input
+                      onChange={
+                        event =>
+                          self.send(
+                            SetFilename((
+                              index,
+                              ReactEvent.Form.target(event)##value,
+                            )),
+                          )
+                      }
+                      value=file##name
+                    />
+                    <button onClick={_ => self.send(RemoveFile(index))}>
+                      "X"->ReasonReact.string
+                    </button>
+                    <br />
+                  </div>
+                )
+              |> ReasonReact.array
+            }
+            <button onClick={_ => self.send(SaveFiles)}>
+              "Save"->ReasonReact.string
+            </button>
+          </div> :
+          ReasonReact.null
       }
-      <p>
-        ("Logged in: " ++ self.state.isLoggedIn->string_of_bool)
-        ->ReasonReact.string
-      </p>
       {
         if (Js.String.length(self.state.ipfsHash) > 0) {
           <p>
@@ -191,26 +189,35 @@ let make = (~data, _children) => {
         id="select-files">
         "Upload a file"->ReasonReact.string
       </button>
-      {
-        !self.state.isLoggedIn ?
-          <button
-            onClick={
-              _ =>
-                ThreeBox.openBox(
-                  ThreeBox.web3##eth##accounts[0],
-                  ThreeBox.web3##currentProvider,
-                )
-                |> Repromise.andThen(value => {
-                     self.send(SetThreeBox(value));
-                     Repromise.resolved(value);
-                   })
-                |> Repromise.wait(Js.log)
-            }>
-            "Login to save your files to your 3box account!"
-            ->ReasonReact.string
-          </button> :
-          ReasonReact.null
-      }
+      <BrowserWeb3Capabilities
+        isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
+        ...{
+             ({hasWeb3, isLoggedIn}) =>
+               hasWeb3 ?
+                 !isLoggedIn ?
+                   <button
+                     onClick={
+                       _ =>
+                         ThreeBox.openBox(
+                           ThreeBox.web3##eth##accounts[0],
+                           ThreeBox.web3##currentProvider,
+                         )
+                         |> Repromise.andThen(value => {
+                              self.send(SetThreeBox(value));
+                              Repromise.resolved(value);
+                            })
+                         |> Repromise.wait(Js.log)
+                     }>
+                     "Login to save your files to your 3box account!"
+                     ->ReasonReact.string
+                   </button> :
+                   ReasonReact.null :
+                 <a href="https://metamask.io">
+                   "Install MetaMask to save your files to a 3box account!"
+                   ->ReasonReact.string
+                 </a>
+           }
+      </BrowserWeb3Capabilities>
       {
         self.state.isLoggedIn ?
           <button onClick={_ => self.send(Logout)}>

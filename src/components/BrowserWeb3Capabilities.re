@@ -6,6 +6,7 @@ type state = {
   isLockedAccount: bool,
   isCurrentWeb3AddressSameAsLoggedInAddress: bool,
   currentNetworkName: string,
+  isLoggedIn: bool,
 };
 
 type action =
@@ -25,6 +26,7 @@ let make = (~isLoggedIn, ~loggedInAddress, children) => {
     isLockedAccount: false,
     isCurrentWeb3AddressSameAsLoggedInAddress: false,
     currentNetworkName: "",
+    isLoggedIn,
   },
   didMount: self => {
     let getWeb3StatusIntervalId =
