@@ -4,14 +4,20 @@ external initUppy: (string => unit) => unit = "default";
 [@bs.module "../lib/Store.js"]
 external storeFile: (ThreeBox.threeBox, string) => unit = "storeFile";
 
+[@bs.deriving abstract]
+type file = {
+  name: string,
+  hash: string,
+};
+
 [@bs.module "../lib/Store.js"]
-external fetchFiles: (ThreeBox.threeBox, array(string) => unit) => unit =
+external fetchFiles: (ThreeBox.threeBox, array(file) => unit) => unit =
   "fetchFiles";
 
 type state = {
   isLoggedIn: bool,
   ipfsHash: string,
-  files: array(string),
+  files: array(file),
   threeBox: Js.Nullable.t(ThreeBox.threeBox),
 };
 
@@ -19,7 +25,7 @@ type action =
   | SetLoggedIn(bool)
   | Logout
   | PersistFile(string)
-  | SetFiles(array(string))
+  | SetFiles(array(file))
   | FetchFiles
   | SetThreeBox(ThreeBox.threeBox);
 let component = ReasonReact.reducerComponent("App");
@@ -113,8 +119,8 @@ let make = (~data, _children) => {
       {
         self.state.files
         ->Belt.Array.mapWithIndex((index, file) =>
-            <div key={file ++ index->string_of_int}>
-              <input ariaReadonly=true value=file />
+            <div key={file->hashGet ++ index->string_of_int}>
+              <input ariaReadonly=true value=file->hashGet />
               <br />
             </div>
           )
