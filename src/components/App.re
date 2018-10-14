@@ -95,7 +95,10 @@ let make = (~data, _children) => {
         ),
       )
     | SetThreeBox(threeBox) =>
-      ReasonReact.Update({...state, threeBox: Js.Nullable.return(threeBox)})
+      ReasonReact.UpdateWithSideEffects(
+        {...state, threeBox: Js.Nullable.return(threeBox)},
+        (self => self.send(SetLoggedIn(true))),
+      )
     | SaveFiles =>
       ReasonReact.SideEffects(
         (
@@ -117,17 +120,10 @@ let make = (~data, _children) => {
         ),
       )
     | Logout =>
-      ReasonReact.SideEffects(
+      ReasonReact.UpdateWithSideEffects(
+        {...state, isLoggedIn: false, files: [||]},
         (
-          self =>
-            extractBox(
-              self.state.threeBox,
-              box => {
-                self.send(SetLoggedIn(false));
-                self.send(SetFiles([||]));
-                ThreeBox.logout(box);
-              },
-            )
+          self => extractBox(self.state.threeBox, box => ThreeBox.logout(box))
         ),
       )
     },
@@ -206,12 +202,11 @@ let make = (~data, _children) => {
                 )
                 |> Repromise.andThen(value => {
                      self.send(SetThreeBox(value));
-                     self.send(SetLoggedIn(true));
                      Repromise.resolved(value);
                    })
                 |> Repromise.wait(Js.log)
             }>
-            "Login to save files to your 3box account private store!"
+            "Login to save your files to your 3box account!"
             ->ReasonReact.string
           </button> :
           ReasonReact.null
@@ -219,7 +214,7 @@ let make = (~data, _children) => {
       {
         self.state.isLoggedIn ?
           <button onClick={_ => self.send(Logout)}>
-            "LOGOUT"->ReasonReact.string
+            "Logout"->ReasonReact.string
           </button> :
           ReasonReact.null
       }
