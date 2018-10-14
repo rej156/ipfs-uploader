@@ -33,6 +33,7 @@ type action =
   | SetFilename((int, string))
   | FetchFiles
   | SaveFiles
+  | RemoveFile(int)
   | SetThreeBox(ThreeBox.threeBox);
 let component = ReasonReact.reducerComponent("App");
 
@@ -75,6 +76,15 @@ let make = (~data, _children) => {
       let newFiles = state.files;
       Belt.Array.setUnsafe(newFiles, index, newFile);
       ReasonReact.Update({...state, files: newFiles});
+    | RemoveFile(index) =>
+      let newFiles =
+        Belt.Array.keepWithIndex(state.files, (_file, fileIndex) =>
+          fileIndex !== index
+        );
+      ReasonReact.UpdateWithSideEffects(
+        {...state, files: newFiles},
+        (self => self.send(SaveFiles)),
+      );
     | FetchFiles =>
       ReasonReact.SideEffects(
         (
@@ -95,13 +105,14 @@ let make = (~data, _children) => {
             )
         ),
       )
+
     | PersistFile(ipfsHash) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, ipfsHash},
         (
           self => {
             extractBox(self.state.threeBox, box => storeFile(box, ipfsHash));
-            Js.Global.setTimeout(() => self.send(FetchFiles), 500) |> ignore;
+            Js.Global.setTimeout(() => self.send(FetchFiles), 800) |> ignore;
           }
         ),
       )
@@ -113,6 +124,7 @@ let make = (~data, _children) => {
               self.state.threeBox,
               box => {
                 self.send(SetLoggedIn(false));
+                self.send(SetFiles([||]));
                 ThreeBox.logout(box);
               },
             )
@@ -135,7 +147,7 @@ let make = (~data, _children) => {
       {
         Js.Array.length(self.state.files) > 0 ?
           <h3> "Your private list of files"->ReasonReact.string </h3> :
-          ReasonReact.null
+          <h3> "Upload some files!"->ReasonReact.string </h3>
       }
       {
         self.state.files
@@ -154,6 +166,9 @@ let make = (~data, _children) => {
                 }
                 value=file##name
               />
+              <button onClick={_ => self.send(RemoveFile(index))}>
+                "❌"->ReasonReact.string
+              </button>
               <button onClick={_ => self.send(SaveFiles)}>
                 "Save"->ReasonReact.string
               </button>
@@ -180,25 +195,33 @@ let make = (~data, _children) => {
         id="select-files">
         "Upload a file"->ReasonReact.string
       </button>
-      <button
-        onClick={
-          _ =>
-            ThreeBox.openBox(
-              ThreeBox.web3##eth##accounts[0],
-              ThreeBox.web3##currentProvider,
-            )
-            |> Repromise.andThen(value => {
-                 self.send(SetThreeBox(value));
-                 self.send(SetLoggedIn(true));
-                 Repromise.resolved(value);
-               })
-            |> Repromise.wait(Js.log)
-        }>
-        "LOGIN"->ReasonReact.string
-      </button>
-      <button onClick={_ => self.send(Logout)}>
-        "LOGOUT"->ReasonReact.string
-      </button>
+      {
+        !self.state.isLoggedIn ?
+          <button
+            onClick={
+              _ =>
+                ThreeBox.openBox(
+                  ThreeBox.web3##eth##accounts[0],
+                  ThreeBox.web3##currentProvider,
+                )
+                |> Repromise.andThen(value => {
+                     self.send(SetThreeBox(value));
+                     self.send(SetLoggedIn(true));
+                     Repromise.resolved(value);
+                   })
+                |> Repromise.wait(Js.log)
+            }>
+            "LOGIN"->ReasonReact.string
+          </button> :
+          ReasonReact.null
+      }
+      {
+        self.state.isLoggedIn ?
+          <button onClick={_ => self.send(Logout)}>
+            "LOGOUT"->ReasonReact.string
+          </button> :
+          ReasonReact.null
+      }
     </div>,
   /* <GatsbyLink
        style={ReactDOMRe.Style.make(~margin="0", ())} to_="/page-2">
