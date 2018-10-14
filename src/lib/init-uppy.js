@@ -117,7 +117,7 @@ class IPFSUploader extends Plugin {
             console.log(ipfsFile)
             this.uppy.log(`IPFS Upload of file ${file.id} finished.`)
 
-            const uploadURL = `https://gateway.ipfs.io/ipfs/${ipfsFile.hash}`
+            const uploadURL = `https://ipfs.infura.io/ipfs/${ipfsFile.hash}`
 
             const response = {
               status: 200,

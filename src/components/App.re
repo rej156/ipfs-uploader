@@ -167,7 +167,7 @@ let make = (~data, _children) => {
                 value=file##name
               />
               <button onClick={_ => self.send(RemoveFile(index))}>
-                "❌"->ReasonReact.string
+                "X"->ReasonReact.string
               </button>
               <button onClick={_ => self.send(SaveFiles)}>
                 "Save"->ReasonReact.string
