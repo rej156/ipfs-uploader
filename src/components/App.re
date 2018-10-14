@@ -112,7 +112,12 @@ let make = (~data, _children) => {
       }
       {
         self.state.files
-        ->Belt.Array.map(file => <p key=file> file->ReasonReact.string </p>)
+        ->Belt.Array.mapWithIndex((index, file) =>
+            <div key={file ++ index->string_of_int}>
+              <input ariaReadonly=true value=file />
+              <br />
+            </div>
+          )
         |> ReasonReact.array
       }
       <p>
