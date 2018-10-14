@@ -6,7 +6,7 @@ let make = (~siteTitle: string, _children) => {
     <div
       style={
         ReactDOMRe.Style.make(
-          ~background="rebeccapurple",
+          ~background="lightblue",
           ~marginBottom="1.45rem",
           (),
         )

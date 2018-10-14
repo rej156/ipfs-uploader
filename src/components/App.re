@@ -211,7 +211,8 @@ let make = (~data, _children) => {
                    })
                 |> Repromise.wait(Js.log)
             }>
-            "LOGIN"->ReasonReact.string
+            "Login to save files to your 3box account private store!"
+            ->ReasonReact.string
           </button> :
           ReasonReact.null
       }
