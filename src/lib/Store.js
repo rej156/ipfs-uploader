@@ -15,3 +15,9 @@ export const fetchFiles = (box, callback) =>
     console.log(files)
     typeof callback === 'function' && callback(files)
   })
+
+export const saveFiles = (box, files, callback) =>
+  box.private.set(prefixKey('files'), files).then(result => {
+    console.log(result)
+    fetchFiles(box, callback)
+  })

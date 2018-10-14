@@ -1,14 +1,18 @@
+type file = {
+  .
+  "name": string,
+  "hash": string,
+};
+
 [@bs.module "../lib/init-uppy.js"]
 external initUppy: (string => unit) => unit = "default";
 
 [@bs.module "../lib/Store.js"]
 external storeFile: (ThreeBox.threeBox, string) => unit = "storeFile";
 
-[@bs.deriving abstract]
-type file = {
-  name: string,
-  hash: string,
-};
+[@bs.module "../lib/Store.js"]
+external saveFiles: (ThreeBox.threeBox, array(file), string => unit) => unit =
+  "saveFiles";
 
 [@bs.module "../lib/Store.js"]
 external fetchFiles: (ThreeBox.threeBox, array(file) => unit) => unit =
@@ -26,7 +30,9 @@ type action =
   | Logout
   | PersistFile(string)
   | SetFiles(array(file))
+  | SetFilename((int, string))
   | FetchFiles
+  | SaveFiles
   | SetThreeBox(ThreeBox.threeBox);
 let component = ReasonReact.reducerComponent("App");
 
@@ -63,6 +69,12 @@ let make = (~data, _children) => {
         (self => self.send(FetchFiles)),
       )
     | SetFiles(files) => ReasonReact.Update({...state, files})
+    | SetFilename((index, name)) =>
+      let newFile = state.files[index];
+      let newFile = Js.Obj.assign(newFile, {"name": name});
+      let newFiles = state.files;
+      Belt.Array.setUnsafe(newFiles, index, newFile);
+      ReasonReact.Update({...state, files: newFiles});
     | FetchFiles =>
       ReasonReact.SideEffects(
         (
@@ -74,6 +86,15 @@ let make = (~data, _children) => {
       )
     | SetThreeBox(threeBox) =>
       ReasonReact.Update({...state, threeBox: Js.Nullable.return(threeBox)})
+    | SaveFiles =>
+      ReasonReact.SideEffects(
+        (
+          self =>
+            extractBox(self.state.threeBox, box =>
+              saveFiles(box, self.state.files, files => Js.log(files))
+            )
+        ),
+      )
     | PersistFile(ipfsHash) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, ipfsHash},
@@ -119,8 +140,23 @@ let make = (~data, _children) => {
       {
         self.state.files
         ->Belt.Array.mapWithIndex((index, file) =>
-            <div key={file->hashGet ++ index->string_of_int}>
-              <input ariaReadonly=true value=file->hashGet />
+            <div key={file##hash ++ index->string_of_int}>
+              <input ariaReadonly=true defaultValue=file##hash />
+              <input
+                onChange={
+                  event =>
+                    self.send(
+                      SetFilename((
+                        index,
+                        ReactEvent.Form.target(event)##value,
+                      )),
+                    )
+                }
+                value=file##name
+              />
+              <button onClick={_ => self.send(SaveFiles)}>
+                "Save"->ReasonReact.string
+              </button>
               <br />
             </div>
           )
