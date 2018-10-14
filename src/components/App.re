@@ -192,9 +192,9 @@ let make = (~data, _children) => {
       <BrowserWeb3Capabilities
         isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
         ...{
-             ({hasWeb3, isLoggedIn}) =>
+             ({hasWeb3}) =>
                hasWeb3 ?
-                 !isLoggedIn ?
+                 !self.state.isLoggedIn ?
                    <button
                      onClick={
                        _ =>
@@ -211,20 +211,15 @@ let make = (~data, _children) => {
                      "Login to save your files to your 3box account!"
                      ->ReasonReact.string
                    </button> :
-                   ReasonReact.null :
+                   <button onClick={_ => self.send(Logout)}>
+                     "Logout"->ReasonReact.string
+                   </button> :
                  <a href="https://metamask.io">
                    "Install MetaMask to save your files to a 3box account!"
                    ->ReasonReact.string
                  </a>
            }
       </BrowserWeb3Capabilities>
-      {
-        self.state.isLoggedIn ?
-          <button onClick={_ => self.send(Logout)}>
-            "Logout"->ReasonReact.string
-          </button> :
-          ReasonReact.null
-      }
     </div>,
   /* <GatsbyLink
        style={ReactDOMRe.Style.make(~margin="0", ())} to_="/page-2">
