@@ -4,7 +4,7 @@ const prefixKey = key => 'ipfsUploader/' + key
 export const storeFile = (box, ipfsHash) =>
   box.private.get(prefixKey('files')).then(files => {
     const newFiles = Array.isArray(files) ? files : []
-    newFiles.push({ name: '', hash: ipfsHash })
+    newFiles.push({ name: '', hash: ipfsHash, date: Date.now() })
     box.private
       .set(prefixKey('files'), newFiles)
       .then(result => console.log(result))
