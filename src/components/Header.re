@@ -7,7 +7,7 @@ let make = (~siteTitle: string, _children) => {
       <div>
         <AppBar position=`Static color=`Primary>
           <Toolbar>
-            <Typography variant=`H4>
+            <Typography variant=`H3>
               {ReasonReact.string(siteTitle)}
             </Typography>
           </Toolbar>

@@ -140,8 +140,12 @@ let make = (~data, _children) => {
         <Header siteTitle=data##site##siteMetadata##title />
         {
           Js.Array.length(self.state.files) > 0 ?
-            <h3> "Your private list of files"->ReasonReact.string </h3> :
-            <h3> "Upload some files!"->ReasonReact.string </h3>
+            <Typography variant=`H5>
+              "Your private list of files"->ReasonReact.string
+            </Typography> :
+            <Typography variant=`H5>
+              "Upload some files!"->ReasonReact.string
+            </Typography>
         }
         {
           Js.Array.length(self.state.files) > 0 ?
@@ -150,11 +154,20 @@ let make = (~data, _children) => {
                 self.state.files
                 ->Belt.Array.mapWithIndex((index, file) =>
                     <ListItem key={file##hash ++ index->string_of_int}>
-                      <button onClick={_ => self.send(RemoveFile(index))}>
-                        <Avatar> {j|❎|j}->ReasonReact.string </Avatar>
-                      </button>
-                      <input ariaReadonly=true defaultValue=file##hash />
-                      <input
+                      <div
+                        style={ReactDOMRe.Style.make(~cursor="pointer", ())}
+                        onClick={_ => self.send(RemoveFile(index))}>
+                        <Avatar>
+                          <Icon color=`Primary>
+                            "delete"->ReasonReact.string
+                          </Icon>
+                        </Avatar>
+                      </div>
+                      <TextField
+                        disabled=true
+                        defaultValue={`String(file##hash)}
+                      />
+                      <TextField
                         onChange={
                           event =>
                             self.send(
@@ -165,35 +178,59 @@ let make = (~data, _children) => {
                             )
                         }
                         placeholder="File name"
-                        value=file##name
+                        value={`String(file##name)}
                       />
-                      <span> "Uploaded at: "->ReasonReact.string </span>
-                      <span>
+                      <Typography variant=`Title>
                         {
-                          (
+                          "Uploaded at: "
+                          ++ (
                             file##date
                             |> Js.Date.fromString
-                            |> Js.Date.getUTCFullYear
+                            |> Js.Date.getFullYear
                             |> string_of_float
                           )
                           ++ (
                             file##date
                             |> Js.Date.fromString
                             |> Js.Date.getMonth
-                            |> (month => month +. 1.0)
                             |> string_of_float
                           )
                           ++ (
                             file##date
                             |> Js.Date.fromString
-                            |> Js.Date.getDate
+                            |> Js.Date.getDay
                             |> string_of_float
                           )
-                          |> ReasonReact.string
                         }
-                      </span>
+                      </Typography>
                     </ListItem>
                   )
+                /*
+                 yyyy-MM-ddThh:mm
+                 <span>
+                      {
+                        (
+                          file##date
+                          |> Js.Date.fromString
+                          |> Js.Date.getUTCFullYear
+                          |> string_of_float
+                        )
+                        ++ (
+                          file##date
+                          |> Js.Date.fromString
+                          |> Js.Date.getMonth
+                          |> (month => month +. 1.0)
+                          |> string_of_float
+                        )
+                        ++ (
+                          file##date
+                          |> Js.Date.fromString
+                          |> Js.Date.getDate
+                          |> string_of_float
+                        )
+                        |> ReasonReact.string
+                      }
+                    </span> */
                 |> ReasonReact.array
               }
               <button onClick={_ => self.send(SaveFiles)}>
