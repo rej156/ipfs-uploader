@@ -92,57 +92,58 @@ let make = (~data, _children) => {
     },
   render: self =>
     <div>
-      <Helmet title=data##site##siteMetadata##title meta>
-        <link
-          href="https://transloadit.edgly.net/releases/uppy/v0.27.5/dist/uppy.min.css"
-          rel="stylesheet"
-        />
-      </Helmet>
-      <Header siteTitle=data##site##siteMetadata##title />
-      <BrowserWeb3Capabilities
-        isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
-        ...{_ => <p> "HEY"->ReasonReact.string </p>}
-      </BrowserWeb3Capabilities>
-      {
-        self.state.files
-        ->Belt.Array.map(file => <p key=file> file->ReasonReact.string </p>)
-        |> ReasonReact.array
-      }
-      <p>
-        "isLoggedIn status"->ReasonReact.string
-        <br />
-        ("OCaml ftw " ++ self.state.isLoggedIn->string_of_bool)
-        ->ReasonReact.string
-      </p>
-      <button
-        onClick={_ => initUppy(ipfsHash => self.send(PersistFile(ipfsHash)))}
-        id="select-files">
-        "CLICK ME"->ReasonReact.string
-      </button>
-      <button
-        onClick={
-          _ =>
-            ThreeBox.openBox(
-              ThreeBox.web3##eth##accounts[0],
-              ThreeBox.web3##currentProvider,
-            )
-            |> Repromise.andThen(value => {
-                 self.send(SetThreeBox(value));
-                 self.send(SetLoggedIn(true));
-                 Repromise.resolved(value);
-               })
-            |> Repromise.wait(Js.log)
-        }>
-        "LOGIN"->ReasonReact.string
-      </button>
-      <button onClick={_ => self.send(Logout)}>
-        "LOGOUT"->ReasonReact.string
-      </button>
-      <GatsbyLink
-        style={ReactDOMRe.Style.make(~margin="0", ())} to_="/page-2">
-        {ReasonReact.string("GatsbyLink To Page 2")}
-      </GatsbyLink>
-    </div>,
+
+        <Helmet title=data##site##siteMetadata##title meta>
+          <link
+            href="https://transloadit.edgly.net/releases/uppy/v0.27.5/dist/uppy.min.css"
+            rel="stylesheet"
+          />
+        </Helmet>
+        <Header siteTitle=data##site##siteMetadata##title />
+        /* <BrowserWeb3Capabilities
+             isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
+             ...{_ => <p> "HEY"->ReasonReact.string </p>}
+           </BrowserWeb3Capabilities> */
+        {
+          self.state.files
+          ->Belt.Array.map(file => <p key=file> file->ReasonReact.string </p>)
+          |> ReasonReact.array
+        }
+        <p>
+          ("isLoggedIn status: " ++ self.state.isLoggedIn->string_of_bool)
+          ->ReasonReact.string
+        </p>
+        <button
+          onClick={
+            _ => initUppy(ipfsHash => self.send(PersistFile(ipfsHash)))
+          }
+          id="select-files">
+          "Upload a file"->ReasonReact.string
+        </button>
+        <button
+          onClick={
+            _ =>
+              ThreeBox.openBox(
+                ThreeBox.web3##eth##accounts[0],
+                ThreeBox.web3##currentProvider,
+              )
+              |> Repromise.andThen(value => {
+                   self.send(SetThreeBox(value));
+                   self.send(SetLoggedIn(true));
+                   Repromise.resolved(value);
+                 })
+              |> Repromise.wait(Js.log)
+          }>
+          "LOGIN"->ReasonReact.string
+        </button>
+        <button onClick={_ => self.send(Logout)}>
+          "LOGOUT"->ReasonReact.string
+        </button>
+      </div>,
+      /* <GatsbyLink
+           style={ReactDOMRe.Style.make(~margin="0", ())} to_="/page-2">
+           {ReasonReact.string("GatsbyLink To Page 2")}
+         </GatsbyLink> */
 };
 
 let default =
