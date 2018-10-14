@@ -106,12 +106,17 @@ let make = (~data, _children) => {
            ...{_ => <p> "HEY"->ReasonReact.string </p>}
          </BrowserWeb3Capabilities> */
       {
+        Js.Array.length(self.state.files) > 0 ?
+          <h3> "Your private list of files"->ReasonReact.string </h3> :
+          ReasonReact.null
+      }
+      {
         self.state.files
         ->Belt.Array.map(file => <p key=file> file->ReasonReact.string </p>)
         |> ReasonReact.array
       }
       <p>
-        ("isLoggedIn status: " ++ self.state.isLoggedIn->string_of_bool)
+        ("Logged in: " ++ self.state.isLoggedIn->string_of_bool)
         ->ReasonReact.string
       </p>
       {

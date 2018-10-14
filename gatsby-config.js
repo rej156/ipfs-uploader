@@ -1,6 +1,6 @@
 module.exports = {
   siteMetadata: {
-    title: 'Gatsby v2 ReasonML',
+    title: 'IPFS Uploader',
   },
   pathPrefix: `/extra`,
   plugins: [
