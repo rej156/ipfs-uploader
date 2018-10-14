@@ -11,5 +11,6 @@ export const storeFile = (box, ipfsHash) =>
 
 export const fetchFiles = (box, callback) =>
   box.private.get(prefixKey('files')).then(files => {
+    console.log(files)
     typeof callback === 'function' && callback(files)
   })
