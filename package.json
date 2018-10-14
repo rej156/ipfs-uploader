@@ -5,6 +5,8 @@
   "author": "Jeremy Berglund",
   "dependencies": {
     "@aantron/repromise": "^0.6.0",
+    "@jsiebern/bs-material-ui": "^0.4.2",
+    "@material-ui/core": "^3.2.1",
     "@uppy/core": "^0.27.3",
     "@uppy/dashboard": "^0.27.5",
     "@uppy/url": "^0.27.5",
@@ -18,6 +20,7 @@
     "gatsby-plugin-reason": "^2.0.0-alpha.1",
     "ipfs-api": "^24.0.2",
     "react-helmet": "^5.2.0",
+    "react-jss": "^8.6.1",
     "reason-react": "^0.5.3"
   },
   "repository": {

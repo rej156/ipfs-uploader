@@ -129,130 +129,133 @@ let make = (~data, _children) => {
       )
     },
   render: self =>
-    <div>
-      <Helmet title=data##site##siteMetadata##title meta>
-        <link
-          href="https://transloadit.edgly.net/releases/uppy/v0.27.5/dist/uppy.min.css"
-          rel="stylesheet"
-        />
-      </Helmet>
-      <Header siteTitle=data##site##siteMetadata##title />
-      {
-        Js.Array.length(self.state.files) > 0 ?
-          <h3> "Your private list of files"->ReasonReact.string </h3> :
-          <h3> "Upload some files!"->ReasonReact.string </h3>
-      }
-      {
-        Js.Array.length(self.state.files) > 0 ?
-          <div>
-            {
-              self.state.files
-              ->Belt.Array.mapWithIndex((index, file) =>
-                  <div key={file##hash ++ index->string_of_int}>
-                    <input ariaReadonly=true defaultValue=file##hash />
-                    <input
-                      onChange={
-                        event =>
-                          self.send(
-                            SetFilename((
-                              index,
-                              ReactEvent.Form.target(event)##value,
-                            )),
-                          )
-                      }
-                      placeholder="File name"
-                      value=file##name
-                    />
-                    <span> "Uploaded at: "->ReasonReact.string </span>
-                    <span>
-                      {
-                        (
-                          file##date
-                          |> Js.Date.fromString
-                          |> Js.Date.getUTCFullYear
-                          |> string_of_float
-                        )
-                        ++ (
-                          file##date
-                          |> Js.Date.fromString
-                          |> Js.Date.getMonth
-                          |> (month => month +. 1.0)
-                          |> string_of_float
-                        )
-                        ++ (
-                          file##date
-                          |> Js.Date.fromString
-                          |> Js.Date.getDate
-                          |> string_of_float
-                        )
-                        |> ReasonReact.string
-                      }
-                    </span>
-                    <button onClick={_ => self.send(RemoveFile(index))}>
-                      {j|❎|j}->ReasonReact.string
-                    </button>
-                    <br />
-                  </div>
-                )
-              |> ReasonReact.array
-            }
-            <button onClick={_ => self.send(SaveFiles)}>
-              "Save file data"->ReasonReact.string
-            </button>
-          </div> :
-          ReasonReact.null
-      }
-      {
-        if (Js.String.length(self.state.ipfsHash) > 0) {
-          <div>
-            <p> "Last uploaded file: "->ReasonReact.string </p>
-            <input defaultValue={self.state.ipfsHash} ariaReadonly=true />
-          </div>;
-        } else {
-          ReasonReact.null;
+    MaterialUi.(
+      <div>
+        <Helmet title=data##site##siteMetadata##title meta>
+          <link
+            href="https://transloadit.edgly.net/releases/uppy/v0.27.5/dist/uppy.min.css"
+            rel="stylesheet"
+          />
+        </Helmet>
+        <Header siteTitle=data##site##siteMetadata##title />
+        {
+          Js.Array.length(self.state.files) > 0 ?
+            <h3> "Your private list of files"->ReasonReact.string </h3> :
+            <h3> "Upload some files!"->ReasonReact.string </h3>
         }
-      }
-      <button
-        onClick={_ => initUppy(ipfsHash => self.send(PersistFile(ipfsHash)))}
-        id="select-files">
-        (
-          self.state.isLoggedIn ?
-            "Upload a file to your 3box account" : "Upload a file"
-        )
-        ->ReasonReact.string
-      </button>
-      <BrowserWeb3Capabilities
-        isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
-        ...{
-             ({hasWeb3}) =>
-               hasWeb3 ?
-                 !self.state.isLoggedIn ?
-                   <button
-                     onClick={
-                       _ =>
-                         ThreeBox.openBox(
-                           ThreeBox.web3##eth##accounts[0],
-                           ThreeBox.web3##currentProvider,
-                         )
-                         |> Repromise.andThen(value => {
-                              self.send(SetThreeBox(value));
-                              Repromise.resolved(value);
-                            })
-                         |> Repromise.wait(Js.log)
-                     }>
-                     "Login to save your files to your 3box account!"
+        {
+          Js.Array.length(self.state.files) > 0 ?
+            <List>
+              {
+                self.state.files
+                ->Belt.Array.mapWithIndex((index, file) =>
+                    <ListItem key={file##hash ++ index->string_of_int}>
+                      <button onClick={_ => self.send(RemoveFile(index))}>
+                        <Avatar> {j|❎|j}->ReasonReact.string </Avatar>
+                      </button>
+                      <input ariaReadonly=true defaultValue=file##hash />
+                      <input
+                        onChange={
+                          event =>
+                            self.send(
+                              SetFilename((
+                                index,
+                                ReactEvent.Form.target(event)##value,
+                              )),
+                            )
+                        }
+                        placeholder="File name"
+                        value=file##name
+                      />
+                      <span> "Uploaded at: "->ReasonReact.string </span>
+                      <span>
+                        {
+                          (
+                            file##date
+                            |> Js.Date.fromString
+                            |> Js.Date.getUTCFullYear
+                            |> string_of_float
+                          )
+                          ++ (
+                            file##date
+                            |> Js.Date.fromString
+                            |> Js.Date.getMonth
+                            |> (month => month +. 1.0)
+                            |> string_of_float
+                          )
+                          ++ (
+                            file##date
+                            |> Js.Date.fromString
+                            |> Js.Date.getDate
+                            |> string_of_float
+                          )
+                          |> ReasonReact.string
+                        }
+                      </span>
+                    </ListItem>
+                  )
+                |> ReasonReact.array
+              }
+              <button onClick={_ => self.send(SaveFiles)}>
+                "Save file data"->ReasonReact.string
+              </button>
+            </List> :
+            ReasonReact.null
+        }
+        {
+          if (Js.String.length(self.state.ipfsHash) > 0) {
+            <div>
+              <p> "Last uploaded file: "->ReasonReact.string </p>
+              <input defaultValue={self.state.ipfsHash} ariaReadonly=true />
+            </div>;
+          } else {
+            ReasonReact.null;
+          }
+        }
+        <button
+          onClick={
+            _ => initUppy(ipfsHash => self.send(PersistFile(ipfsHash)))
+          }
+          id="select-files">
+          (
+            self.state.isLoggedIn ?
+              "Upload a file to your 3box account" : "Upload a file"
+          )
+          ->ReasonReact.string
+        </button>
+        <BrowserWeb3Capabilities
+          isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
+          ...{
+               ({hasWeb3}) =>
+                 hasWeb3 ?
+                   !self.state.isLoggedIn ?
+                     <button
+                       onClick={
+                         _ =>
+                           ThreeBox.openBox(
+                             ThreeBox.web3##eth##accounts[0],
+                             ThreeBox.web3##currentProvider,
+                           )
+                           |> Repromise.andThen(value => {
+                                self.send(SetThreeBox(value));
+                                Repromise.resolved(value);
+                              })
+                           |> Repromise.wait(Js.log)
+                       }>
+                       "Login to save your files to your 3box account!"
+                       ->ReasonReact.string
+                     </button> :
+                     <button onClick={_ => self.send(Logout)}>
+                       "Logout"->ReasonReact.string
+                     </button> :
+                   <a href="https://metamask.io">
+                     "Install MetaMask to save your files to a 3box account!"
                      ->ReasonReact.string
-                   </button> :
-                   <button onClick={_ => self.send(Logout)}>
-                     "Logout"->ReasonReact.string
-                   </button> :
-                 <a href="https://metamask.io">
-                   "Install MetaMask to save your files to a 3box account!"
-                   ->ReasonReact.string
-                 </a>
-           }
-      </BrowserWeb3Capabilities>
-    </div>,
+                   </a>
+             }
+        </BrowserWeb3Capabilities>
+      </div>
+    ),
   /* <GatsbyLink
        style={ReactDOMRe.Style.make(~margin="0", ())} to_="/page-2">
        {ReasonReact.string("GatsbyLink To Page 2")}

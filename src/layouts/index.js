@@ -18,6 +18,10 @@ const Layout = ({ children }) => (
       <div>
         <Helmet>
           <script src={withPrefix('/3box.min.js')} type="text/javascript" />
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
+          />
         </Helmet>
         {children(data)}
       </div>
