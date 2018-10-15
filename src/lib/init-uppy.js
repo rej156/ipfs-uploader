@@ -105,7 +105,6 @@ class IPFSUploader extends Plugin {
       timer.progress()
 
       let progress = 0
-      let progressCount = 0
 
       const saveToIpfs = reader => {
         const buffer = Buffer.from(reader.result)
@@ -113,7 +112,6 @@ class IPFSUploader extends Plugin {
           buffer,
           {
             progress: p => {
-              progressCount += 1
               progress = p
               this.uppy.log(
                 `[IPFS-Uploader] ${file.id} progress: ${progress} / ${
@@ -212,7 +210,7 @@ export default callback => {
     //   locale: {},
     // })
     .use(Dashboard, {
-      trigger: '#select-files',
+      trigger: '.select-files',
       closeModalOnClickOutside: true,
       showProgressDetails: false,
       proudlyDisplayPoweredByUppy: false,

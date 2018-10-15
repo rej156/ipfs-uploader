@@ -140,20 +140,20 @@ let make = (~data, _children) => {
         <Header siteTitle=data##site##siteMetadata##title />
         {
           Js.Array.length(self.state.files) > 0 ?
-            <Typography variant=`H5>
+            <Typography gutterBottom=true variant=`H5>
               "Your private list of files"->ReasonReact.string
             </Typography> :
-            <Typography variant=`H5>
+            <Typography gutterBottom=true variant=`H5>
               "Upload some files!"->ReasonReact.string
             </Typography>
         }
         {
           Js.Array.length(self.state.files) > 0 ?
-            <List>
+            <GridList cols={`Int(4)}>
               {
                 self.state.files
                 ->Belt.Array.mapWithIndex((index, file) =>
-                    <ListItem key={file##hash ++ index->string_of_int}>
+                    <Grid item=true key={file##hash ++ index->string_of_int}>
                       <div
                         style={ReactDOMRe.Style.make(~cursor="pointer", ())}
                         onClick={_ => self.send(RemoveFile(index))}>
@@ -164,6 +164,7 @@ let make = (~data, _children) => {
                         </Avatar>
                       </div>
                       <TextField
+                        fullWidth=true
                         disabled=true
                         defaultValue={`String(file##hash)}
                       />
@@ -203,7 +204,7 @@ let make = (~data, _children) => {
                           )
                         }
                       </Typography>
-                    </ListItem>
+                    </Grid>
                   )
                 /*
                  yyyy-MM-ddThh:mm
@@ -233,64 +234,97 @@ let make = (~data, _children) => {
                     </span> */
                 |> ReasonReact.array
               }
-              <button onClick={_ => self.send(SaveFiles)}>
-                "Save file data"->ReasonReact.string
-              </button>
-            </List> :
+            </GridList> :
+            ReasonReact.null
+        }
+        {
+          Js.Array.length(self.state.files) > 0 ?
+            <Button
+              color=`Primary
+              variant=`Outlined
+              onClick={_ => self.send(SaveFiles)}>
+              "Save file data"->ReasonReact.string
+            </Button> :
             ReasonReact.null
         }
         {
           if (Js.String.length(self.state.ipfsHash) > 0) {
-            <div>
-              <p> "Last uploaded file: "->ReasonReact.string </p>
-              <input defaultValue={self.state.ipfsHash} ariaReadonly=true />
-            </div>;
+            <Grid container=true direction=`Row spacing=V8>
+              <Grid item=true>
+                <Typography variant=`H6>
+                  "Last uploaded file: "->ReasonReact.string
+                </Typography>
+              </Grid>
+              <Grid item=true xs=V6>
+                <TextField
+                  fullWidth=true
+                  disabled=true
+                  defaultValue={`String(self.state.ipfsHash)}
+                />
+              </Grid>
+            </Grid>;
           } else {
             ReasonReact.null;
           }
         }
-        <button
-          onClick={
-            _ => initUppy(ipfsHash => self.send(PersistFile(ipfsHash)))
-          }
-          id="select-files">
-          (
-            self.state.isLoggedIn ?
-              "Upload a file to your 3box account" : "Upload a file"
-          )
-          ->ReasonReact.string
-        </button>
-        <BrowserWeb3Capabilities
-          isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
-          ...{
-               ({hasWeb3}) =>
-                 hasWeb3 ?
-                   !self.state.isLoggedIn ?
-                     <button
-                       onClick={
-                         _ =>
-                           ThreeBox.openBox(
-                             ThreeBox.web3##eth##accounts[0],
-                             ThreeBox.web3##currentProvider,
-                           )
-                           |> Repromise.andThen(value => {
-                                self.send(SetThreeBox(value));
-                                Repromise.resolved(value);
-                              })
-                           |> Repromise.wait(Js.log)
-                       }>
-                       "Login to save your files to your 3box account!"
-                       ->ReasonReact.string
-                     </button> :
-                     <button onClick={_ => self.send(Logout)}>
-                       "Logout"->ReasonReact.string
-                     </button> :
-                   <a href="https://metamask.io">
-                     "Install MetaMask to save your files to a 3box account!"
-                     ->ReasonReact.string
-                   </a>
-             }
-        </BrowserWeb3Capabilities>
+        <Grid container=true spacing=V16>
+          <Grid item=true>
+            <Button
+              onClick={
+                _ => initUppy(ipfsHash => self.send(PersistFile(ipfsHash)))
+              }
+              color=`Primary
+              variant=`Raised
+              className="select-files">
+              (
+                self.state.isLoggedIn ?
+                  "Upload a file to your 3box account" : "Upload a file"
+              )
+              ->ReasonReact.string
+            </Button>
+          </Grid>
+          <Grid item=true>
+            <BrowserWeb3Capabilities
+              isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
+              ...{
+                   ({hasWeb3}) =>
+                     hasWeb3 ?
+                       !self.state.isLoggedIn ?
+                         <Button
+                           color=`Secondary
+                           variant=`Outlined
+                           onClick={
+                             _ =>
+                               ThreeBox.openBox(
+                                 ThreeBox.web3##eth##accounts[0],
+                                 ThreeBox.web3##currentProvider,
+                               )
+                               |> Repromise.andThen(value => {
+                                    self.send(SetThreeBox(value));
+                                    Repromise.resolved(value);
+                                  })
+                               |> Repromise.wait(Js.log)
+                           }>
+                           "Login to save your files to your 3box account!"
+                           ->ReasonReact.string
+                         </Button> :
+                         <Button
+                           color=`Secondary
+                           variant=`Outlined
+                           onClick={_ => self.send(Logout)}>
+                           "Logout"->ReasonReact.string
+                         </Button> :
+                       <Button
+                         color=`Secondary
+                         variant=`Outlined
+                         href="https://metamask.io">
+                         "Install MetaMask to save your files to a 3box account!"
+                         ->ReasonReact.string
+                       </Button>
+                 }
+            </BrowserWeb3Capabilities>
+          </Grid>
+        </Grid>
       </div>
     ),
   /* <GatsbyLink

@@ -6,7 +6,6 @@ import {
   createGenerateClassName,
 } from '@material-ui/core/styles'
 import blue from '@material-ui/core/colors/blue'
-import purple from '@material-ui/core/colors/purple'
 import green from '@material-ui/core/colors/green'
 
 // A theme with custom primary and secondary color.
@@ -15,12 +14,12 @@ const theme = createMuiTheme({
   palette: {
     primary: {
       light: blue[300],
-      main: blue[500],
-      dark: blue[700],
+      main: blue[400],
+      dark: blue[600],
     },
     secondary: {
       light: green[300],
-      main: green[500],
+      main: green[400],
       dark: green[700],
     },
   },
