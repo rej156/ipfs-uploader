@@ -92,10 +92,10 @@ class IPFSUploader extends Plugin {
 
   upload(file, current, total) {
     return new Promise((resolve, reject) => {
-      this.uppy.log(`uploading ${current} of ${total}`)
       console.log(file)
       const reader = new FileReader()
       reader.readAsArrayBuffer(file.data)
+      this.uppy.log(`uploading ${current} of ${total}`)
 
       const timer = this.createProgressTimeout(uppyConfig.timeout, error => {
         this.uppy.emit('upload-error', file, error)
@@ -104,13 +104,38 @@ class IPFSUploader extends Plugin {
       this.uppy.log(`[IPFSUpload] ${file.id} started`)
       timer.progress()
 
+      let progress = 0
+      let progressCount = 0
+
       const saveToIpfs = reader => {
         const buffer = Buffer.from(reader.result)
-        ipfs
-          .add(buffer, {
-            progress: progress => console.log(`received: ${progress}`),
-          })
-          .then(res => {
+        ipfs.add(
+          buffer,
+          {
+            progress: p => {
+              progressCount += 1
+              progress = p
+              this.uppy.log(
+                `[IPFS-Uploader] ${file.id} progress: ${progress} / ${
+                  file.size
+                }`
+              )
+              timer.progress()
+              console.log(progress)
+              console.log(p)
+              this.uppy.emit('upload-progress', file, {
+                uploader: this,
+                bytesUploaded: progress / file.size,
+                bytesTotal: file.size,
+              })
+            },
+          },
+          (err, res) => {
+            if (err) {
+              console.error(err)
+              this.uppy.emit('upload-error', file, err)
+              reject(err)
+            }
             console.log(res)
             let ipfsFile = res[0]
             const body = ipfsFile
@@ -132,38 +157,30 @@ class IPFSUploader extends Plugin {
             this.uppy.on('upload-cancel', fileID => {})
 
             this.uppy.on('cancel-all', () => {})
-            this.uppy.emit('upload-progress', file, {
-              uploader: this,
-              bytesUploaded: file.size,
-              bytesTotal: file.size,
-            })
+            // this.uppy.emit('upload-progress', file, {
+            //   uploader: this,
+            //   bytesUploaded: file.size,
+            //   bytesTotal: file.size,
+            // })
 
             this.uppy.emit('upload-success', file, body, uploadURL)
             timer.done()
             resolve(ipfsFile)
-          })
-          .catch(err => {
-            console.error(err)
-            this.uppy.emit('upload-error', file, err)
-            reject(err)
-          })
+          }
+        )
       }
       reader.onloadend = () => saveToIpfs(reader)
     })
   }
 
-  ipfsUploader = fileIDS => {
-    return Promise.resolve()
-  }
-
   install() {
     this.uppy.addUploader(fileIDs => {
       if (fileIDs.length === 0) {
-        this.uppy.log('[XHRUpload] No files to upload!')
+        this.uppy.log('[IPFS-Uploader] No files to upload!')
         return Promise.resolve()
       }
 
-      this.uppy.log('[XHRUpload] Uploading...')
+      this.uppy.log('[IPFS-Uploader] Uploading...')
       const files = fileIDs.map(fileID => this.uppy.getFile(fileID))
 
       if (this.opts.bundle) {
@@ -172,7 +189,6 @@ class IPFSUploader extends Plugin {
 
       return this.uploadFiles(files).then(() => null)
     })
-    // this.uppy.addUploader(this.ipfsUploader)
   }
 
   uninstall() {
