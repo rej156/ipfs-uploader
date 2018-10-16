@@ -38,10 +38,13 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
-    "start": "gatsby build && gatsby serve",
+    "start": "gatsby build && gatsby serve -p 8080",
     "dev": "gatsby develop",
     "clean": "bsb -clean-world",
     "format": "prettier --write 'src/**/*.js'"
+  },
+  "engines": {
+    "node": "10.x"
   },
   "devDependencies": {
     "prettier": "^1.11.1"
