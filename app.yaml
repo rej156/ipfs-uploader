@@ -1,0 +1,3 @@
+service: ipfs-uploader
+runtime: nodejs
+env: flex
