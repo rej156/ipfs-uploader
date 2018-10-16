@@ -287,27 +287,32 @@ let make = (~data, _children) => {
             <BrowserWeb3Capabilities
               isLoggedIn={self.state.isLoggedIn} loggedInAddress="123456789">
               ...{
-                   ({hasWeb3}) =>
+                   ({hasWeb3, isLockedAccount}) =>
                      hasWeb3 ?
                        !self.state.isLoggedIn ?
-                         <Button
-                           color=`Secondary
-                           variant=`Outlined
-                           onClick={
-                             _ =>
-                               ThreeBox.openBox(
-                                 ThreeBox.web3##eth##accounts[0],
-                                 ThreeBox.web3##currentProvider,
-                               )
-                               |> Repromise.andThen(value => {
-                                    self.send(SetThreeBox(value));
-                                    Repromise.resolved(value);
-                                  })
-                               |> Repromise.wait(Js.log)
-                           }>
-                           "Login to save your files to your 3box account!"
-                           ->ReasonReact.string
-                         </Button> :
+                         isLockedAccount ?
+                           <Typography color=`Secondary variant=`H6>
+                             "Unlock your account to login and save files!"
+                             ->ReasonReact.string
+                           </Typography> :
+                           <Button
+                             color=`Secondary
+                             variant=`Outlined
+                             onClick={
+                               _ =>
+                                 ThreeBox.openBox(
+                                   ThreeBox.web3##eth##accounts[0],
+                                   ThreeBox.web3##currentProvider,
+                                 )
+                                 |> Repromise.andThen(value => {
+                                      self.send(SetThreeBox(value));
+                                      Repromise.resolved(value);
+                                    })
+                                 |> Repromise.wait(Js.log)
+                             }>
+                             "Login to save your files to your 3box account!"
+                             ->ReasonReact.string
+                           </Button> :
                          <Button
                            color=`Secondary
                            variant=`Outlined
