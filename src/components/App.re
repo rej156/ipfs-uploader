@@ -202,6 +202,19 @@ let make = (~data, _children) => {
                             |> Js.Date.getDay
                             |> string_of_float
                           )
+                          ++ " - "
+                          ++ (
+                            file##date
+                            |> Js.Date.fromString
+                            |> Js.Date.getHours
+                            |> string_of_float
+                          )
+                          ++ (
+                            file##date
+                            |> Js.Date.fromString
+                            |> Js.Date.getMinutes
+                            |> string_of_float
+                          )
                         }
                       </Typography>
                     </Grid>
