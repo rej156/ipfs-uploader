@@ -38,6 +38,7 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
+    "start": "gatsby build && gatsby serve",
     "dev": "gatsby develop",
     "clean": "bsb -clean-world",
     "format": "prettier --write 'src/**/*.js'"
