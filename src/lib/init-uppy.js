@@ -3,7 +3,11 @@ const { Plugin } = require('@uppy/core')
 const Dashboard = require('@uppy/dashboard')
 const settle = require('@uppy/utils/lib/settle')
 const Webcam = require('@uppy/webcam')
-// const Url = require('@uppy/url')
+const Transloadit = require('@uppy/transloadit')
+const Instagram = require('@uppy/instagram')
+const Dropbox = require('@uppy/dropbox')
+const GoogleDrive = require('@uppy/google-drive')
+const Url = require('@uppy/url')
 const IPFS = require('ipfs-api')
 
 const ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' })
@@ -204,11 +208,20 @@ export default callback => {
       facingMode: 'user',
       locale: {},
     })
-    // TODO: Deploy serverless uppy companion server
-    // .use(Url, {
-    //   serverUrl: 'https://server.uppy.io/',
-    //   locale: {},
-    // })
+    .use(Transloadit, {
+      params: {
+        auth: {
+          key: require('../../env.js').TRANSLOADIT_APIKEY,
+        },
+        steps: {
+          result: {
+            use: ':original',
+            result: true,
+            robot: '/image/optimize',
+          },
+        },
+      },
+    })
     .use(Dashboard, {
       trigger: '.select-files',
       closeModalOnClickOutside: true,
@@ -219,8 +232,42 @@ export default callback => {
         // , 'Url'
       ],
     })
+
+    .use(Instagram, {
+      target: Dashboard,
+      serverUrl: 'https://api2.transloadit.com/companion',
+      serverPattern: /\.transloadit\.com$/,
+    })
+    .use(Dropbox, {
+      target: Dashboard,
+      serverUrl: 'https://api2.transloadit.com/companion',
+      serverPattern: /\.transloadit\.com$/,
+    })
+    .use(GoogleDrive, {
+      target: Dashboard,
+      serverUrl: 'https://api2.transloadit.com/companion',
+      serverPattern: /\.transloadit\.com$/,
+    })
+    .use(Url, {
+      target: Dashboard,
+      serverUrl: 'https://api2.transloadit.com/companion',
+      serverPattern: /\.transloadit\.com$/,
+    })
     .use(IPFSUploader)
 
+  uppy.on('transloadit:result', (_, result) => {
+    console.log(result)
+    // console.log(
+    //   `Upload complete! We’ve uploaded these files: ${JSON.stringify(
+    //     result.successful
+    //   )}`
+    // )
+    // typeof callback === 'function' && callback(result.successful[0].uploadURL)
+    // setTimeout(() => {
+    //   uppy.getPlugin('Dashboard').closeModal()
+    //   uppy.close()
+    // }, 400)
+  })
   uppy.on('complete', result => {
     console.log(result)
     console.log(
@@ -228,11 +275,26 @@ export default callback => {
         result.successful
       )}`
     )
-    typeof callback === 'function' && callback(result.successful[0].uploadURL)
-    setTimeout(() => {
+    if (result.successful[0].uploadURL.includes('transloadit')) {
+      ipfs.util
+        .addFromURL(result.successful[0].uploadURL)
+        .then(res => res[0] && res[0].hash)
+        .then(ipfsHash => {
+          const uploadURL = `https://ipfs.infura.io/ipfs/${ipfsHash}`
+          typeof callback === 'function' && callback(uploadURL)
+          uppy.getPlugin('Dashboard').closeModal()
+          uppy.close()
+        })
+        .catch(console.error)
+    } else {
+      typeof callback === 'function' && callback(result.successful[0].uploadURL)
       uppy.getPlugin('Dashboard').closeModal()
       uppy.close()
-    }, 400)
+    }
+    // setTimeout(() => {
+    //   uppy.getPlugin('Dashboard').closeModal()
+    //   uppy.close()
+    // }, 400)
   })
 
   uppy.run()
