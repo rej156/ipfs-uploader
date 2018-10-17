@@ -20,6 +20,7 @@ external fetchFiles: (ThreeBox.threeBox, array(file) => unit) => unit =
   "fetchFiles";
 
 type state = {
+  isLoggingIn: bool,
   isLoggedIn: bool,
   ipfsHash: string,
   files: array(file),
@@ -28,6 +29,7 @@ type state = {
 
 type action =
   | SetLoggedIn(bool)
+  | SetLoggingIn(bool)
   | Logout
   | PersistFile(string)
   | SetFiles(array(file))
@@ -59,6 +61,7 @@ let make = (~data, _children) => {
   ...component,
   initialState: () => {
     isLoggedIn: false,
+    isLoggingIn: false,
     threeBox: Js.Nullable.undefined,
     ipfsHash: "",
     files: [||],
@@ -71,6 +74,8 @@ let make = (~data, _children) => {
         (self => self.send(FetchFiles)),
       )
     | SetFiles(files) => ReasonReact.Update({...state, files})
+    | SetLoggingIn(status) =>
+      ReasonReact.Update({...state, isLoggingIn: status})
     | SetFilename((index, name)) =>
       let newFile = state.files[index];
       let newFile = Js.Obj.assign(newFile, {"name": name});
@@ -137,6 +142,26 @@ let make = (~data, _children) => {
             rel="stylesheet"
           />
         </Helmet>
+        <Dialog fullScreen=true open_={self.state.isLoggingIn}>
+          <DialogContent
+            style={
+              ReactDOMRe.Style.make(
+                ~height="100%",
+                ~display="flex",
+                ~flexDirection="column",
+                ~justifyContent="center",
+                ~alignItems="center",
+                (),
+              )
+            }>
+            <CircularProgress />
+            <DialogContentText>
+              <Typography gutterBottom=true variant=`Body1>
+                "Logging into 3box!"
+              </Typography>
+            </DialogContentText>
+          </DialogContent>
+        </Dialog>
         <Header siteTitle=data##site##siteMetadata##title />
         {
           Js.Array.length(self.state.files) > 0 ?
@@ -312,7 +337,8 @@ let make = (~data, _children) => {
                              color=`Secondary
                              variant=`Outlined
                              onClick={
-                               _ =>
+                               _ => {
+                                 self.send(SetLoggingIn(true));
                                  ThreeBox.openBox(
                                    ThreeBox.web3##eth##accounts[0],
                                    ThreeBox.web3##currentProvider,
@@ -321,7 +347,11 @@ let make = (~data, _children) => {
                                       self.send(SetThreeBox(value));
                                       Repromise.resolved(value);
                                     })
-                                 |> Repromise.wait(Js.log)
+                                 |> Repromise.wait(box => {
+                                      Js.log(box);
+                                      self.send(SetLoggingIn(false));
+                                    });
+                               }
                              }>
                              "Login to save your files to your 3box account!"
                              ->ReasonReact.string
