@@ -18,5 +18,7 @@ RUN yarn install --production || \
   cat yarn-error.log; \
   fi) && false)
 
+RUN yarn build:bs
 RUN yarn build
+EXPOSE 8080
 CMD yarn start

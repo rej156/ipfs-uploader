@@ -37,6 +37,7 @@
   "license": "MIT",
   "scripts": {
     "build": "gatsby build",
+    "build:bs": "bsb -make-world",
     "develop": "gatsby develop",
     "start": "gatsby serve -p 8080",
     "dev": "gatsby develop",
