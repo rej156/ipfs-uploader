@@ -11,10 +11,16 @@ export const storeFile = (box, ipfsHash) =>
   })
 
 export const fetchFiles = (box, callback) =>
-  box.private.get(prefixKey('files')).then(files => {
-    console.log(files)
-    typeof callback === 'function' && callback(files)
-  })
+  box.private
+    .get(prefixKey('files'))
+    .then(files => {
+      if (!Array.isArray(files))
+        return typeof callback === 'function' && callback([])
+      typeof callback === 'function' && callback(files)
+    })
+    .catch(err => {
+      console.error(err)
+    })
 
 export const saveFiles = (box, files, callback) =>
   box.private.set(prefixKey('files'), files).then(result => {
