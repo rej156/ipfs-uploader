@@ -5,7 +5,7 @@
   "bs-dependencies": [
     "reason-react",
     "gatsby-link-reason",
-    "@aantron/repromise",
+    "reason-promise",
     "@jsiebern/bs-material-ui"
   ],
   "sources": [

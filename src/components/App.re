@@ -343,11 +343,11 @@ let make = (~data, _children) => {
                                    ThreeBox.web3##eth##accounts[0],
                                    ThreeBox.web3##currentProvider,
                                  )
-                                 |> Repromise.andThen(value => {
+                                 ->Promise.flatMap(value => {
                                       self.send(SetThreeBox(value));
-                                      Repromise.resolved(value);
+                                      Promise.resolved(value);
                                     })
-                                 |> Repromise.wait(box => {
+                                 ->Promise.get(box => {
                                       Js.log(box);
                                       self.send(SetLoggingIn(false));
                                     });
